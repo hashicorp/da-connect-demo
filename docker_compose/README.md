@@ -128,6 +128,6 @@ nc localhost 9191
 ```
 
 ## TODO
-[ ] Add intentions and show denied intention with `Service3`
-[ ] Add real PostgreSQL database
-[ ] Show using `ngrep` traffic is secured with TLS
+[ ] Add intentions and show denied intention with `Service3`  
+[ ] Add real PostgreSQL database  
+[ ] Show using `ngrep` traffic is secured with TLS  
