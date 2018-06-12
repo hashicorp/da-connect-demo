@@ -2,7 +2,7 @@ version: '3'
 services:
 
   consul_server:
-    image: nicholasjackson/connect:latest
+    image: consul_connect:latest
     entrypoint: "consul agent -config-file /etc/consul.d/consul.hcl -config-format hcl -client 0.0.0.0"
     volumes:
       - "./consul_server.hcl:/etc/consul.d/consul.hcl"
@@ -15,12 +15,12 @@ services:
       - "8501:8500"
   
   service1:
-    image: nicholasjackson/connect:latest
+    image: consul_connect:latest
     entrypoint: "/startup_service.sh"
     volumes:
       - "./consul_agent.hcl:/etc/consul.d/consul.hcl"
       - "./startup_service.sh:/startup_service.sh"
-      - "./connect_service1.json:/service1.json"
+      - "./connect_service1.json:/service.json"
     networks:
       connect_network: {}
     environment:
@@ -28,12 +28,12 @@ services:
       CONSUL_CLIENT_INTERFACE: eth0
   
   service2:
-    image: nicholasjackson/connect:latest
+    image: consul_connect:latest
     entrypoint: "/startup_service.sh"
     volumes:
       - "./consul_agent.hcl:/etc/consul.d/consul.hcl"
       - "./startup_service.sh:/startup_service.sh"
-      - "./connect_service2.json:/service2.json"
+      - "./connect_service2.json:/service.json"
     networks:
       connect_network: {}
     environment:

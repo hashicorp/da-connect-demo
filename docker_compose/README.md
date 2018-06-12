@@ -78,12 +78,12 @@ We are registering a service on port 8080 with no upstreams, the bind_port for t
 
 From the `Service1` docker shell
 ```bash
-curl -s -X PUT -d @/service1.json "http://127.0.0.1:8500/v1/agent/service/register" | jq
+curl -s -X PUT -d @/service.json "http://127.0.0.1:8500/v1/agent/service/register" | jq
 ```
 
 You will see this registered in the service catalog and connect 
 ```bash
-curl -s "http://localhost:8501/v1/health/connect/service1" | jq
+curl -s "http://localhost:8500/v1/health/connect/service1" | jq
 ```
 
 ## Start the Connect proxy for `Service2`
@@ -113,9 +113,14 @@ We are registering a service on port 8080 again the bind port is `443` however t
 
 From the `Service2` docker shell
 ```bash
-curl -s -X PUT -d @/service2.json "http://127.0.0.1:8500/v1/agent/service/register" | jq
+curl -s -X PUT -d @/service.json "http://127.0.0.1:8500/v1/agent/service/register" | jq
 ```
 
+You will see this registered in the service catalog and connect 
+```bash
+curl -s "http://localhost:8500/v1/health/connect/service2" | jq
+
+```
 2. Connect to the service and show the echo works
 
 ```bash
