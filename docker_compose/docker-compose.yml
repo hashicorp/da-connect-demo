@@ -1,0 +1,46 @@
+version: '3'
+services:
+
+  consul_server:
+    image: nicholasjackson/connect:latest
+    entrypoint: "consul agent -config-file /etc/consul.d/consul.hcl -config-format hcl -client 0.0.0.0"
+    volumes:
+      - "./consul_server.hcl:/etc/consul.d/consul.hcl"
+    networks:
+      connect_network: {}
+    environment:
+      CONSUL_BIND_INTERFACE: eth0
+      CONSUL_UI_BETA: "true"
+    ports:
+      - "8501:8500"
+  
+  service1:
+    image: nicholasjackson/connect:latest
+    entrypoint: "/startup_service.sh"
+    volumes:
+      - "./consul_agent.hcl:/etc/consul.d/consul.hcl"
+      - "./startup_service.sh:/startup_service.sh"
+      - "./connect_service1.json:/service1.json"
+    networks:
+      connect_network: {}
+    environment:
+      CONSUL_BIND_INTERFACE: eth0
+      CONSUL_CLIENT_INTERFACE: eth0
+  
+  service2:
+    image: nicholasjackson/connect:latest
+    entrypoint: "/startup_service.sh"
+    volumes:
+      - "./consul_agent.hcl:/etc/consul.d/consul.hcl"
+      - "./startup_service.sh:/startup_service.sh"
+      - "./connect_service2.json:/service2.json"
+    networks:
+      connect_network: {}
+    environment:
+      CONSUL_BIND_INTERFACE: eth0
+      CONSUL_CLIENT_INTERFACE: eth0
+
+networks:
+  connect_network:
+    external: false
+    driver: bridge
