@@ -3,7 +3,7 @@ This is a simple demo showing command line operations of Consul Connect using Do
 
 ## Setup
 1. Install Docker
-2. Download the consul binary with connect from the private docs: (https://s3.us-east-2.amazonaws.com/consul-dev-artifacts/consul-connect/1.2.0-beta2/consul_1.2.0-beta2_linux_amd64.zip)[https://s3.us-east-2.amazonaws.com/consul-dev-artifacts/consul-connect/1.2.0-beta2/consul_1.2.0-beta2_linux_amd64.zip] and save to this location
+2. Download the consul binary with connect from the private docs: [Connect Binary for Linux](https://s3.us-east-2.amazonaws.com/consul-dev-artifacts/consul-connect/1.2.0-beta2/consul_1.2.0-beta2_linux_amd64.zip) and save to this location
 3. Build the base docker image (this probably only needs to be done once `docker build -t consul_connect:latest .`
 4. Start the various services `docker-compose -p connect up`
 
