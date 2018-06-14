@@ -1,0 +1,7 @@
+FROM postgres
+
+RUN apt-get update; apt-get install -y net-tools jq curl ngrep
+
+COPY ./consul /usr/local/bin/consul
+
+EXPOSE 5432

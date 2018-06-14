@@ -4,11 +4,7 @@
   "connect": {
     "proxy": {
       "config": {
-        "bind_port": 443,
-        "upstreams": [{
-            "destination_name": "service1",
-            "local_bind_port": 9191
-        }]
+        "bind_port": 443
       }
     }
   }

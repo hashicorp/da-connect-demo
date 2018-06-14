@@ -3,6 +3,9 @@ services:
 
   consul_server:
     image: consul_connect:latest
+    build:
+      context: ./
+      dockerfile: Dockerfile
     entrypoint: "consul agent -config-file /etc/consul.d/consul.hcl -config-format hcl -client 0.0.0.0"
     volumes:
       - "./consul_server.hcl:/etc/consul.d/consul.hcl"
@@ -16,11 +19,15 @@ services:
   
   service1:
     image: consul_connect:latest
+    build:
+      context: ./
+      dockerfile: Dockerfile
     entrypoint: "/startup_service.sh"
     volumes:
       - "./consul_agent.hcl:/etc/consul.d/consul.hcl"
       - "./startup_service.sh:/startup_service.sh"
-      - "./connect_service1.json:/service.json"
+      - "./connect_service1a.json:/servicea.json"
+      - "./connect_service1b.json:/serviceb.json"
     networks:
       connect_network: {}
     environment:
@@ -29,6 +36,9 @@ services:
   
   service2:
     image: consul_connect:latest
+    build:
+      context: ./
+      dockerfile: Dockerfile
     entrypoint: "/startup_service.sh"
     volumes:
       - "./consul_agent.hcl:/etc/consul.d/consul.hcl"
@@ -39,6 +49,24 @@ services:
     environment:
       CONSUL_BIND_INTERFACE: eth0
       CONSUL_CLIENT_INTERFACE: eth0
+  
+  postgres:
+    image: consul_connect_postgres:latest
+    build:
+      context: ./
+      dockerfile: Dockerfile_postgres
+    entrypoint: "/startup_postgres.sh"
+    command: "postgres"
+    volumes:
+      - "./startup_postgres.sh:/startup_postgres.sh"
+      - "./consul_agent.hcl:/etc/consul.d/consul.hcl"
+      - "./connect_postgres.json:/service.json"
+    networks:
+      connect_network: {}
+    environment:
+      CONSUL_BIND_INTERFACE: eth0
+      CONSUL_CLIENT_INTERFACE: eth0
+      POSTGRES_PASSWORD: postgres
 
 networks:
   connect_network:
