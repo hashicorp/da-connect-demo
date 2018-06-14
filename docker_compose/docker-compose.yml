@@ -6,9 +6,10 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
-    entrypoint: "consul agent -config-file /etc/consul.d/consul.hcl -config-format hcl -client 0.0.0.0"
+    entrypoint: "/startup_consul.sh"
     volumes:
       - "./consul_server.hcl:/etc/consul.d/consul.hcl"
+      - "./startup_consul.sh:/startup_consul.sh"
     networks:
       connect_network: {}
     environment:
