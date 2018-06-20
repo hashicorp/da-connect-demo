@@ -1,6 +1,6 @@
-FROM ubuntu
+FROM alpine
 
-RUN apt-get update; apt-get install -y socat netcat curl net-tools jq postgresql-client iptables ngrep
+RUN apk update; apk add socat netcat-openbsd curl jq postgresql-client ngrep
 
 COPY ./consul /usr/local/bin/consul
 

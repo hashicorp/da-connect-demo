@@ -30,8 +30,6 @@ docker exec -it connect_[container]_1 /bin/bash
 // e.g. docker exec -it connect_Postgres_1 /bin/bash
 ```
 
-* By default all Intentions are set to deny at startup `consul intention create -deny '*' '*'`
-
 ## Show connect is running and a root certificate has been created
 Consul is running as 8500 inside the container but this is mapped to 8501 outside of docker, the following command will show the root certificate which has automatically been generated for the Connect CA.
 
@@ -117,53 +115,6 @@ curl -s "http://localhost:8500/v1/health/connect/service2" | jq
 ngrep -d any port 8080 or 443
 ```
 
-## Intentions
-Intentions define access control for services via Connect and are used to control which services may establish connections. Intentions can be managed via the API, CLI, or UI.
-
-The default intention is `deny all` this is defined by the following intentinon:
-
-**From `Service1` shell**
-```bash
-consul intention get '*' '*'
-
-Source:       *
-Destination:  *
-Action:       deny
-ID:           b63e5f43-36f4-8636-3e0d-0184a0cbb4ae
-Created At:   Thursday, 14-Jun-18 11:52:35 UTC
-Created: * => * (deny)
-```
-
-When we attempt to connect to `Service2` via the connect proxy this time the connect is rejected:
-
-```bash
-nc localhost 9191
-```
-
-To enable the communication we can define an intention which allows `Service1` to communicate with `Service2`:
-```bash
-consul intention create -allow service1 service2
-Created: service1 => service2 (allow)
-```
-
-It is also possible to show the details for the intention using the following command:
-```bash
-consul intention get service1 service2
-Source:       service1
-Destination:  service2
-Action:       allow
-ID:           de933b1b-a7b8-7260-ea7f-0dd47952f4d5
-Created At:   Thursday, 14-Jun-18 11:14:15 UTC
-```
-
-When we again try the connection the service is now accessible:
-
-```bash
-nc localhost 9191
-hello
-hello
-```
-
 Connect routes the request from `localhost` port `9191` on the `Service1` container to port `443` on the `Service2` container, you will see in the shell running `ngrep` that traffic has been received on port `443` and that this traffic is encrypted.  The connect proxy running on `Service2` now routes the encrypted traffic to `localhost` port `8080` as plain traffic.  In addition to SSL, Mutual Authentication is also securing the two proxies.
 
 ```bash
@@ -223,7 +174,7 @@ To communicate with the database we also need to register a new upstream which m
   "connect": {
     "proxy": {
       "config": {
-        "bind_port": 443,
+        "bind_port": 8443,
         "upstreams": [
           {
             "destination_name": "service2",
@@ -245,13 +196,6 @@ To communicate with the database we also need to register a new upstream which m
 curl -s -X PUT -d @/serviceb.json "http://127.0.0.1:8500/v1/agent/service/register" | jq
 ```
 
-Then we need to register the intention to allow the communication:
-
-```bash
-consul intention create -allow service1 postgres
-Created: service1 => postgres (allow)
-```
-
 We should now be able to connect to the postgres server from `Server1` using the proxy port `5432`, connect will again route the traffic from `localhost:5432` to the connect proxy running on the `Postgres` server at port `443`, this will in turn be routed to `localhost:5443` on the `Postgres` server.  All traffic is again secured by TLS and M/TLS.
 
 ```bash
@@ -271,4 +215,64 @@ postgres=# \l
 (3 rows)
 
 postgres=#
+```
+
+## Intentions
+Intentions define access control for services via Connect and are used to control which services may establish connections. Intentions can be managed via the API, CLI, or UI.
+
+Lets create an intention which denies all traffic
+**From `Server` shell**
+```
+consul intention create -allow '*' '*'
+```
+
+```bash
+consul intention get '*' '*'
+
+Source:       *
+Destination:  *
+Action:       deny
+ID:           b63e5f43-36f4-8636-3e0d-0184a0cbb4ae
+Created At:   Thursday, 14-Jun-18 11:52:35 UTC
+Created: * => * (deny)
+```
+
+When we attempt to connect to `Service2` via the connect proxy this time the server no longer responds:
+
+**From `Service1` shell**
+```bash
+nc localhost 9191
+hello
+```
+
+To enable the communication we can define an intention which allows `Service1` to communicate with `Service2`:
+```bash
+consul intention create -allow service1 service2
+Created: service1 => service2 (allow)
+```
+
+It is also possible to show the details for the intention using the following command:
+```bash
+consul intention get service1 service2
+Source:       service1
+Destination:  service2
+Action:       allow
+ID:           de933b1b-a7b8-7260-ea7f-0dd47952f4d5
+Created At:   Thursday, 14-Jun-18 11:14:15 UTC
+```
+
+When we again try the connection the service is now accessible:
+
+```bash
+nc localhost 9191
+hello
+hello
+```
+
+To re-enable communication to the database we can create another intention
+
+**From `Service1` shell**
+```bash
+consul intention create -allow service1 postgres
+Created: service1 => postgres (allow)
 ```

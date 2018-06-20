@@ -56,10 +56,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile_postgres
-    entrypoint: "/startup_postgres.sh"
-    command: "postgres"
     volumes:
-      - "./startup_postgres.sh:/startup_postgres.sh"
       - "./consul_agent.hcl:/etc/consul.d/consul.hcl"
       - "./connect_postgres.json:/service.json"
     networks:

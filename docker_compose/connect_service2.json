@@ -4,7 +4,7 @@
   "connect": {
     "proxy": {
       "config": {
-        "bind_port": 443
+        "bind_port": 8443
       }
     }
   }
