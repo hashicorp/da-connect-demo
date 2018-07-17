@@ -1,2 +1,2 @@
-# da_connect_demo
+# da-connect-demo
 Some simple demos for Consul Connect
