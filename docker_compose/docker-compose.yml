@@ -2,31 +2,18 @@ version: '3'
 services:
 
   consul_server:
-    image: consul_connect:latest
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    entrypoint: "/startup_consul.sh"
-    volumes:
-      - "./consul_server.hcl:/etc/consul.d/consul.hcl"
-      - "./startup_consul.sh:/startup_consul.sh"
-    networks:
-      connect_network: {}
+    image: nicholasjackson/consul_connect:latest
     environment:
       CONSUL_BIND_INTERFACE: eth0
       CONSUL_UI_BETA: "true"
     ports:
       - "8501:8500"
+    networks:
+      connect_network: {}
   
   service1:
-    image: consul_connect:latest
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    entrypoint: "/startup_service.sh"
+    image: nicholasjackson/consul_connect_agent:latest
     volumes:
-      - "./consul_agent.hcl:/etc/consul.d/consul.hcl"
-      - "./startup_service.sh:/startup_service.sh"
       - "./connect_service1a.json:/servicea.json"
       - "./connect_service1b.json:/serviceb.json"
     networks:
@@ -34,37 +21,23 @@ services:
     environment:
       CONSUL_BIND_INTERFACE: eth0
       CONSUL_CLIENT_INTERFACE: eth0
+    command:
+      - "-retry-join"
+      - "consul_server"
   
   service2:
-    image: consul_connect:latest
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    entrypoint: "/startup_service.sh"
+    image: nicholasjackson/consul_connect_agent:latest
     volumes:
-      - "./consul_agent.hcl:/etc/consul.d/consul.hcl"
-      - "./startup_service.sh:/startup_service.sh"
-      - "./connect_service2.json:/service.json"
+      - "./connect_service1a.json:/servicea.json"
+      - "./connect_service1b.json:/serviceb.json"
     networks:
       connect_network: {}
     environment:
       CONSUL_BIND_INTERFACE: eth0
       CONSUL_CLIENT_INTERFACE: eth0
-  
-  postgres:
-    image: consul_connect_postgres:latest
-    build:
-      context: ./
-      dockerfile: Dockerfile_postgres
-    volumes:
-      - "./consul_agent.hcl:/etc/consul.d/consul.hcl"
-      - "./connect_postgres.json:/service.json"
-    networks:
-      connect_network: {}
-    environment:
-      CONSUL_BIND_INTERFACE: eth0
-      CONSUL_CLIENT_INTERFACE: eth0
-      POSTGRES_PASSWORD: postgres
+    command:
+      - "-retry-join"
+      - "consul_server"
 
 networks:
   connect_network:

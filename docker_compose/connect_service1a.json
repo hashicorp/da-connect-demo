@@ -4,7 +4,6 @@
   "connect": {
     "proxy": {
       "config": {
-        "bind_port": 8443,
         "upstreams": [
           {
             "destination_name": "service2",

@@ -1,4 +1,4 @@
-data_dir= "/tmp/consul_demo"
+data_dir= "/tmp/consul"
 
 bootstrap = true
 

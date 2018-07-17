@@ -8,3 +8,5 @@
 # .tfvars files
 *.tfvars
 **/consul
+
+kube_config.yml

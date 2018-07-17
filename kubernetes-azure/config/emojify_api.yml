@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: emojify-api
+  labels:
+    app: emojify-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emojify-api
+  template:
+    metadata:
+      labels:
+        app: emojify-api
+      annotations:
+        consul.register/enabled: "true"
+        consul.register/pod.container.name: "emojify-api"
+        consul.regiser/service.name: "emojify-api"
+    spec:
+      containers:
+      - name: emojify-website
+        image: "nicholasjackson/emojify-api:latest"
+        ports:
+        - containerPort: 9090
+        env:
+        - name: FACEBOX
+          value: http://localhost:8080
+      - name: emojify-api-proxy
+        image: nicholasjackson/consul_connect_agent:latest
+        command: ['/usr/local/bin/consul', 'connect', 'proxy']
+        args: [
+          '-log-level=DEBUG',
+          '-service','emojify-api',
+          '-http-addr','$(HOST_IP):8500',
+          '-register',
+          '-listen','$(POD_IP):8443',
+          '-service-addr','localhost:9090',
+          '-upstream', 'emojify-facebox:8080'
+          ]
+        env:
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+

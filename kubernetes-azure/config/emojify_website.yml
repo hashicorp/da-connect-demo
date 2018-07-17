@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: emojify-website
+  labels:
+    app: emojify-website
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emojify-website
+  template:
+    metadata:
+      labels:
+        app: emojify-website
+      annotations:
+        consul.register/enabled: "true"
+        consul.register/pod.container.name: "emojify-website"
+        consul.regiser/service.name: "emojify-website"
+    spec:
+      containers:
+      - name: emojify-website
+        image: "nicholasjackson/emojify-website:latest"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+      - name: emojify-website-proxy
+        image: nicholasjackson/consul_connect_agent:latest
+        command: ['/usr/local/bin/consul', 'connect', 'proxy']
+        args: [
+          '-log-level=DEBUG',
+          '-service','emojify-website',
+          '-http-addr','$(HOST_IP):8500',
+          '-register',
+          '-listen','$(POD_IP):8443',
+          '-service-addr','localhost:5000'
+          ]
+        env:
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+
