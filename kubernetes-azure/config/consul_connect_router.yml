@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: router
-        image: nicholasjackson/consul-connect-router:v0
+        image: nicholasjackson/consul-connect-router:v0.1
         args: [
           '--upstream=emojify-website#/',
           '--upstream=emojify-api#/api',
