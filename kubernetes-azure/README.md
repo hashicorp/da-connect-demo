@@ -37,6 +37,10 @@ The API server accepts POST requests with the body containing a url to an image,
 ### Face detection service
 [www.machinebox.io](http://www.machinebox.io)
 
+<small>
+	Artificial Intelligence powered by <a href='https://machinebox.io/' target='_blank'>Machine Box</a>
+</small>
+
 To detect faces an image is sent to the `Facebox` instance, this is a 3rd party black box service.
 
 ### Consul Connect Router
