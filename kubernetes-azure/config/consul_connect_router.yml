@@ -32,7 +32,8 @@ spec:
     spec:
       containers:
       - name: router
-        image: nicholasjackson/consul-connect-router:v0.1
+        image: nicholasjackson/consul-connect-router:latest
+        imagePullPolicy: Always
         args: [
           '--upstream=emojify-website#/',
           '--upstream=emojify-api#/api',

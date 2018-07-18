@@ -19,8 +19,9 @@ spec:
         consul.regiser/service.name: "emojify-api"
     spec:
       containers:
-      - name: emojify-website
+      - name: emojify-api
         image: "nicholasjackson/emojify-api:latest"
+        imagePullPolicy: Always
         ports:
         - containerPort: 9090
         env:
