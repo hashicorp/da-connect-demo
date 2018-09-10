@@ -15,7 +15,7 @@ A more fully featured example of a small microservice system running in Kubernet
 ## Slides
 Slide deck showing why a Service Mesh is an important component in todays systems and also how Connect works.
 
-[Keynote](./slides/Consul Connect.key)
+[Keynote](https://github.com/hashicorp/da-connect-demo/tree/master/slides)
 
 ## Interactive Learning
 We have an interactive tutorial for the Connect basics running in Instruqt, you can follow through the exercises without needing to set up any of your own infrastructure.
