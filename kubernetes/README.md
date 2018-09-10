@@ -54,7 +54,13 @@ To route requests from the public internet to the private services the Consul Co
 ## Setup
 The example project runs on Kubernetes, currently the example Terraform will create a cluster in Azure however any Kubernetes cluster will work.
 
-### Create Cluster
+### Install the helm provider
+
+```bash
+./helper install_helm_provider
+```
+
+### Create k8s cluster and provision application with Helm
 To create the cluster on Azure use the Terraform configuration to create a basic cluster.
 
 ```bash
@@ -76,20 +82,6 @@ We then need to set an environment variable pointing to the downloaded configura
 export KUBECONFIG=$(pwd)/kube_config.yml
 ```
 
-### Add applications
-`kubectl` is now configured and we can create the applications in the cluster
-
-```bash
-kubectl apply -f config/consul_server.yml
-kubectl apply -f config/consul_agent.yml
-kubectl apply -f config/consul_register.yml
-kubectl apply -f config/router.yml
-kubectl apply -f config/emojify_api.yml
-kubectl apply -f config/emojify_facebox.yml
-kubectl apply -f config/emojify_website.yml
-
-```
-
 ### Open dashboard
 To view the Kubernetes dashboard we can start the Kube proxy and then open the dashboard in a browser
 
@@ -101,7 +93,19 @@ kubectl proxy &
 The consul server and router create external load balancers, the details can be found by navigating to the 
 Kubernetes dashboard and viewing `services`.
 
+### View the Consul UI
+To view the consul UI you can port forward to the clusters consul-server
+
+```bash
+kubectl port-forward svc/consul-ui 8080:80
+```
+
+Then to view the UI
+
+```
+open "http://localhost:8080/ui
+```
+
 ## TODO
-[] Implement Consul as a separate cluster
 [] Implement Consul ACLs to correctly secure the Consul Agents and Proxies
 [] Add SSL to public loadbalancer

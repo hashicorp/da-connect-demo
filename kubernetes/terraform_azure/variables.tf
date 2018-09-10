@@ -29,3 +29,5 @@ variable "agent_count" {
 variable "client_id" {}
 
 variable "client_secret" {}
+
+variable "subnet_id" {}

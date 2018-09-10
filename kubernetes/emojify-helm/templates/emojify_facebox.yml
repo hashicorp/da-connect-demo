@@ -25,7 +25,7 @@ spec:
         - containerPort: 8080
         env:
         - name: MB_KEY
-          value: "MDVkM2QzOGZiNjM3ZWQ1MjQwYjYzN2Y1NzM5NGQ1ODc.Ux4R7t_vlLyPSCg2FSFJ_ofsIP2iCQcDzMuCwzGhTAj06i6WCHO1CZE2kAmWdUixWnUyYvvI-Ua3Q3w-G22aIw"
+          value: "{{ .Values.machinebox_key }}"
       - name: emojify-facebox-proxy
         image: nicholasjackson/consul_connect_agent:latest
         command: ['/usr/local/bin/consul', 'connect', 'proxy']
