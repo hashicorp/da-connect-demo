@@ -19,7 +19,7 @@ sudo tee /etc/systemd/system/vault.service > /dev/null <<"EOF"
   
   [Service]
   KillSignal=INT
-  ExecStart=/usr/local/bin/vault server -dev -dev-root-token-id=mytoken -client-cert=/etc/vault.d/cert.pem -client-key=/etc/vault.d/key.pem
+  ExecStart=/usr/local/bin/vault server -dev -dev-root-token-id=mytoken
   Restart=always
 EOF
 

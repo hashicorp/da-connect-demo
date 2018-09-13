@@ -104,7 +104,7 @@ resource "tls_self_signed_cert" "vault" {
 
 resource "null_resource" "provision_vault" {
   triggers {
-    ids = "${azurerm_virtual_machine.vault.id}${tls_private_key.vault.id}3"
+    ids = "${azurerm_virtual_machine.vault.id}${tls_private_key.vault.id}0"
   }
 
   connection {

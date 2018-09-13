@@ -9,7 +9,7 @@ module "network" {
   resource_group_name = "${azurerm_resource_group.k8s.name}"
   address_space       = "10.0.0.0/16"
   subnet_prefixes     = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-  subnet_names        = ["subnet1", "subnet2", "subnet3"]
+  subnet_names        = ["data", "kubernetes", "vault"]
 }
 
 # Kubernetes cluster
@@ -48,18 +48,20 @@ provider "helm" {
 # Run consul on kubernetes
 resource "helm_release" "consul" {
   name    = "consul"
-  chart   = "./consul-helm"
+  chart   = "./helm_charts/consul_helm"
   timeout = 1000
 }
 
-# Start our application
-resource "helm_release" "emojify" {
-  name    = "emojify"
-  chart   = "./emojify-helm"
-  timeout = 1000
+# Install the application
+module "emojify" {
+  source = "./emojify"
 
-  set {
-    name  = "machinebox_key"
-    value = "${var.machinebox_key}"
-  }
+  resource_group_name = "${azurerm_resource_group.k8s.name}"
+  location            = "${azurerm_resource_group.k8s.location}"
+  data_subnet_id      = "${module.network.vnet_subnets[0]}"
+
+  vault_ip    = "${module.vault.host}"
+  vault_token = "${module.vault.token}"
+
+  machinebox_key = "${var.machinebox_key}"
 }
