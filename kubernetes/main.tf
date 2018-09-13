@@ -23,6 +23,15 @@ module "k8s" {
   subnet_id           = "${module.network.vnet_subnets[1]}"
 }
 
+# Vault instance
+module "vault" {
+  source = "./vault"
+
+  resource_group_name = "${azurerm_resource_group.k8s.name}"
+  location            = "${azurerm_resource_group.k8s.location}"
+  subnet_id           = "${module.network.vnet_subnets[2]}"
+}
+
 # Consul Helm chart
 provider "helm" {
   kubernetes {
@@ -38,14 +47,16 @@ provider "helm" {
 
 # Run consul on kubernetes
 resource "helm_release" "consul" {
-  name  = "consul"
-  chart = "./consul-helm"
+  name    = "consul"
+  chart   = "./consul-helm"
+  timeout = 1000
 }
 
 # Start our application
 resource "helm_release" "emojify" {
-  name  = "emojify"
-  chart = "./emojify-helm"
+  name    = "emojify"
+  chart   = "./emojify-helm"
+  timeout = 1000
 
   set {
     name  = "machinebox_key"

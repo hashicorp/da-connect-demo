@@ -9,4 +9,5 @@
 *.tfvars
 **/consul
 
+server.pem
 kube_config.yml
