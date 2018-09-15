@@ -8,11 +8,6 @@ cd /tmp
 unzip -o ./vault.zip
 sudo mv -f ./vault /usr/local/bin/
 
-sudo mkdir -p /etc/vault.d
-sudo chmod 755 /etc/vault.d
-sudo mv -f /tmp/cert.pem /etc/vault.d/
-sudo mv -f /tmp/key.pem /etc/vault.d/
-
 sudo tee /etc/systemd/system/vault.service > /dev/null <<"EOF"
   [Unit]
   Description = "Vault"

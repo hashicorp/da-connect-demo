@@ -1,16 +1,21 @@
 provider "azurerm" {}
 
+resource "tls_private_key" "k8s" {
+  algorithm = "RSA"
+  rsa_bits  = "4096"
+}
+
 resource "azurerm_kubernetes_cluster" "k8s" {
   name                = "${var.cluster_name}"
-  location            = "${var.location}"
-  resource_group_name = "${var.resource_group_name}"
-  dns_prefix          = "${var.dns_prefix}"
+  location            = "${azurerm_resource_group.core.location}"
+  resource_group_name = "${azurerm_resource_group.core.name}"
+  dns_prefix          = "${var.cluster_name}"
 
   linux_profile {
     admin_username = "ubuntu"
 
     ssh_key {
-      key_data = "${file("${var.ssh_public_key}")}"
+      key_data = "${tls_private_key.k8s.public_key_openssh}"
     }
   }
 
@@ -21,7 +26,7 @@ resource "azurerm_kubernetes_cluster" "k8s" {
     os_type         = "Linux"
     os_disk_size_gb = 30
 
-    vnet_subnet_id = "${var.subnet_id}"
+    vnet_subnet_id = "${module.network.vnet_subnets[1]}"
   }
 
   # Advanced networking

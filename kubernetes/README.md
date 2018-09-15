@@ -57,53 +57,65 @@ The example project runs on Kubernetes, currently the example Terraform will cre
 ### Install the helm provider
 
 ```bash
-./helper install_helm_provider
+make install_helm_provider
 ```
 
-### Create k8s cluster and provision application with Helm
+### Core infrastructure
+The application is broken into two components, the core infrastructure consists of the Kubernetes cluster with running Consul server, and a Vault instance.
+
+#### Create k8s cluster and provision application with Helm
 To create the cluster on Azure use the Terraform configuration to create a basic cluster.
 
 ```bash
-terraform apply
+make apply_core
 ```
 
-### Fetch K8s config
+#### Open dashboard
+To view the Kubernetes dashboard we can start the Kube proxy and then open the dashboard in a browser
+
+```bash
+make open_dashboard
+```
+
+The consul server and router create external load balancers, the details can be found by navigating to the 
+Kubernetes dashboard and viewing `services`.
+
+#### View the Consul UI
+To view the consul UI you can port forward to the clusters consul-server
+
+```bash
+make open_consul_ui
+```
+
+#### Fetch K8s config
 Once the cluster has been created the configuration which allows connections with `kubectl` can be retrieved with the following script.
 
 ```bash
-./helper.sh config
-
+make get_k8s_config
 ```
 
-### Set env var
 We then need to set an environment variable pointing to the downloaded configuration
 
 ```bash
 export KUBECONFIG=$(pwd)/kube_config.yml
 ```
 
-### Open dashboard
-To view the Kubernetes dashboard we can start the Kube proxy and then open the dashboard in a browser
+You can now use `kubectl` to interact with the cluster
+
+### Application infrastructure
+To install the application and create its required infrastructure perform the following steps:
+
+#### Installing the application
+To install and run the application first ensure you have created the core infrastructure then run
 
 ```bash
-kubectl proxy &
-./helper dashboard
+make apply_app
 ```
 
-The consul server and router create external load balancers, the details can be found by navigating to the 
-Kubernetes dashboard and viewing `services`.
-
-### View the Consul UI
-To view the consul UI you can port forward to the clusters consul-server
+#### Open application frontpage
 
 ```bash
-kubectl port-forward svc/consul-ui 8080:80
-```
-
-Then to view the UI
-
-```
-open "http://localhost:8080/ui
+make open_app
 ```
 
 ## TODO
