@@ -39,7 +39,7 @@ open_dashboard: get_k8s_config
 open_consul_ui: get_k8s_config
 	@kubectl port-forward svc/consul-ui 8080:80 & echo $$! > .pid_kube_ports
 	@echo "Opening Consul UI, To quit, press Ctrl-C"
-	@sleep 1
+	@sleep 3
 	@open "http://localhost:8080/ui"
 	@bash -c "trap 'pkill -F .pid_kube_ports' SIGINT SIGTERM ERR EXIT; sleep 20000"
 

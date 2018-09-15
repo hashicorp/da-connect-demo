@@ -73,7 +73,8 @@ resource "azurerm_virtual_machine" "vault" {
 
 resource "null_resource" "provision_vault" {
   triggers {
-    ids = "${azurerm_virtual_machine.vault.id}${tls_private_key.vault.id}"
+    ids        = "${azurerm_virtual_machine.vault.id}${tls_private_key.vault.id}"
+    ip_address = "${azurerm_public_ip.vault.ip_address}"
   }
 
   connection {
