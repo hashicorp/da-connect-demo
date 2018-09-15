@@ -15,6 +15,7 @@ apply_core:
 
 # Terraform destroy the core infrastructure
 destroy_core:
+	terraform init ./core
 	terraform destroy -state=./core/terraform.tfstate ./core
 
 # Terraform apply the application infrastructure, creates the Emojify app and required data stores
@@ -24,7 +25,8 @@ apply_app:
 
 # Terraform destroy the application infrastructure
 destroy_app:
-	terraform destroy -state=./emojify/terrafrom.tfstate ./emojify
+	terraform init ./emojify
+	terraform destroy -state=./emojify/terraform.tfstate ./emojify
 
 # Open the Kubernetes dashboard, runs kubectl proxy in the background
 open_dashboard: get_k8s_config
