@@ -25,6 +25,7 @@ spec:
       chart: {{ template "consul.chart" . }}
       release: {{ .Release.Name }}
       component: server
+      hasDNS: "true"
   template:
     metadata:
       labels:
@@ -32,6 +33,7 @@ spec:
         chart: {{ template "consul.chart" . }}
         release: {{ .Release.Name }}
         component: server
+        hasDNS: "true"
       annotations:
         "consul.hashicorp.com/connect-inject": "false"
     spec:
@@ -129,7 +131,11 @@ spec:
             - containerPort: 8300
               name: server
             - containerPort: 8600
-              name: dns
+              name: dns-tcp
+              protocol: "TCP"
+            - containerPort: 8600
+              name: dns-udp
+              protocol: "UDP"
           readinessProbe:
             # NOTE(mitchellh): when our HTTP status endpoints support the
             # proper status codes, we should switch to that. This is temporary.
@@ -154,4 +160,7 @@ spec:
         resources:
           requests:
             storage: {{ .Values.server.storage }}
+        {{- if .Values.server.storageClass }}
+        storageClassName: {{ .Values.server.storageClass }}
+        {{- end }}
 {{- end }}

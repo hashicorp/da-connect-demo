@@ -13,10 +13,6 @@ spec:
     metadata:
       labels:
         app: emojify-api
-      annotations:
-        consul.register/enabled: "true"
-        consul.register/pod.container.name: "emojify-api"
-        consul.regiser/service.name: "emojify-api"
     spec:
       containers:
       - name: emojify-api

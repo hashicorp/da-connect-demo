@@ -25,3 +25,35 @@ output "k8s_config" {
 output "k8s_host" {
   value = "${azurerm_kubernetes_cluster.k8s.kube_config.0.host}"
 }
+
+output "vault_host" {
+  value = "${azurerm_public_ip.vault.ip_address}"
+}
+
+output "vault_key" {
+  value = "${tls_private_key.vault.private_key_pem}"
+}
+
+output "jumpbox_host" {
+  value = "${azurerm_public_ip.jumpbox.ip_address}"
+}
+
+output "jumpbox_key" {
+  value = "${tls_private_key.jumpbox.private_key_pem}"
+}
+
+output "vault_service_prinicpal_id" {
+  value = "${azurerm_user_assigned_identity.vault_identity.principal_id}"
+}
+
+output "resource_group_name" {
+  value = "${azurerm_resource_group.core.name}"
+}
+
+output "location" {
+  value = "${azurerm_resource_group.core.location}"
+}
+
+output "subnet_ids" {
+  value = "${module.network.vnet_subnets}"
+}

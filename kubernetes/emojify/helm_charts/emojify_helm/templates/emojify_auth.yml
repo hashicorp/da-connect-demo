@@ -1,0 +1,82 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-auth 
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vault-auth-configmap
+data:
+  auto-auth.config: |
+    "auto_auth" {
+      method "kubernetes" {
+        config {
+          role = "demo"
+        }
+      }
+    
+      sink "file" {
+        config {
+          path = "./token.txt"
+        }
+      }
+    }
+---
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: emojify-auth
+  labels:
+    app: emojify-auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: emojify-auth
+  template:
+    metadata:
+      labels:
+        app: emojify-auth
+    spec:
+      serviceAccountName: vault-auth
+      automountServiceAccountToken: true
+      containers:
+      - name: keratin
+        image: "keratin/authn-server:latest"
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        command: ["/bin/sh"]
+        args: ["-c", "./authn migrate && ./authn server"]
+        env:
+        - name: AUTHN_URL
+          value: "localhost:8080"
+        - name: APP_DOMAINS
+          value: "localhost"
+        - name: DATABASE_URL
+          value: "{{ .Values.database_connection }}"
+        - name: REDIS_URL
+          value: "{{ .Values.redis_connection }}"
+        - name: SECRET_KEY_BASE
+          value: "my-authn-test-secret"
+        - name: HTTP_AUTH_USERNAME
+          value: "hello"
+        - name: HTTP_AUTH_PASSWORD
+          value: "password"
+
+      - name: vault-auth
+        image: "vault:{{ .Values.vault_version }}"
+        imagePullPolicy: Always
+        command: ["vault"]
+        args: ["agent","-address","http://vault.service.consul:8200","-config","/etc/vault.d/auto-auth.config"]
+        volumeMounts:
+        - name: vault-auth-config-file
+          mountPath: /etc/vault.d
+      volumes:
+      - name: vault-auth-config-file
+        configMap:
+          name: vault-auth-configmap
+

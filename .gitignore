@@ -8,8 +8,9 @@
 # .tfvars files
 *.tfvars
 **/consul
+crash.log
 
-server.pem
+*.pem
 kube_config.yml
-kubernetes/.pid_kube_ports
-kubernetes/.pid_kube_proxy
+kubernetes/.pid*
+kubernetes/.pid*

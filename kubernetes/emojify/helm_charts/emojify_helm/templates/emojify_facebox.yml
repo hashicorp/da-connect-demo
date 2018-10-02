@@ -13,10 +13,6 @@ spec:
     metadata:
       labels:
         app: emojify-facebox
-      annotations:
-        consul.register/enabled: "true"
-        consul.register/pod.container.name: "emojify-facebox"
-        consul.regiser/service.name: "emojify-facebox"
     spec:
       containers:
       - name: emojify-facebox
