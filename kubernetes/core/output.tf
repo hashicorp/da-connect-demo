@@ -46,6 +46,10 @@ output "vault_service_prinicpal_id" {
   value = "${azurerm_user_assigned_identity.vault_identity.principal_id}"
 }
 
+output "jumpbox_service_prinicpal_id" {
+  value = "${azurerm_user_assigned_identity.jumpbox_identity.principal_id}"
+}
+
 output "resource_group_name" {
   value = "${azurerm_resource_group.core.name}"
 }

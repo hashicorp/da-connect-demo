@@ -1,15 +1,15 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: vault-auth 
+  name: emojify-auth 
 ---
 
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: vault-auth-configmap
+  name: emojify-auth-configmap
 data:
-  auto-auth.config: |
+  auto-auth: |
     "auto_auth" {
       method "kubernetes" {
         config {
@@ -19,10 +19,44 @@ data:
     
       sink "file" {
         config {
-          path = "./token.txt"
+          path = "/var/run/secrets/vault-token/token.txt"
         }
       }
     }
+ 
+  consultemplate-config: |
+    template {
+      source = "/etc/config/secrets.tmpl"
+      destination = "/var/run/secrets/vault/.env"
+
+      left_delimiter  = "(("
+      right_delimiter = "))"
+    }
+
+    vault {
+      # This is the address of the Vault leader. The protocol (http(s)) portion
+      # of the address is required.
+      address = "http://vault.service.consul:8200"
+    }
+
+  consultemplate-template: |
+    DATABASE_URL=postgres://(( with secret "database/creds/db-role" ))(( .Data.username ))@emojify-db:(( .Data.password ))(( end ))@(( with secret "secret/data/emojify-auth" ))(( .Data.data.db_server ))(( end )):5432/keratin
+    
+    (( with secret "secret/data/emojify-auth" ))
+    REDIS_KEY=(( .Data.data.redis_key ))(( end ))
+
+  keratin-startup: |
+    #!/bin/sh -e
+    if [[ ! -f /var/run/secrets/vault/.env ]] ; then
+      echo 'Secrets do not exist at expected path, exiting...'
+      exit 1
+    fi
+    # Load the vault secrets as environment variables
+    export $(cat /var/run/secrets/vault/.env | xargs) 
+    # Setup the database
+    /app/authn migrate 
+    # Start the server
+    /app/authn server
 ---
 
 apiVersion: apps/v1
@@ -41,23 +75,50 @@ spec:
       labels:
         app: emojify-auth
     spec:
-      serviceAccountName: vault-auth
+      serviceAccountName: emojify-auth
       automountServiceAccountToken: true
+      volumes:
+      - name: config
+        configMap:
+          name: emojify-auth-configmap
+          items:
+          - key: auto-auth
+            path: auto-auth.hcl
+          - key: consultemplate-config
+            path: consultemplate.hcl
+          - key: consultemplate-template
+            path: secrets.tmpl
+      - name: keratin-startup
+        configMap:
+          name: emojify-auth-configmap
+          items:
+          - key: keratin-startup
+            path: startup.sh
+      - name: secrets
+        emptyDir: {}
+      - name: vault-token
+        emptyDir: {}
+
       containers:
       - name: keratin
         image: "keratin/authn-server:latest"
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 8080
         command: ["/bin/sh"]
-        args: ["-c", "./authn migrate && ./authn server"]
+        args: ["/scripts/startup.sh"]
+        volumeMounts:
+        - name: secrets
+          mountPath: /var/run/secrets/vault
+          readOnly: true
+        - name: keratin-startup
+          mountPath: /scripts
+          readOnly: false
         env:
         - name: AUTHN_URL
           value: "localhost:8080"
         - name: APP_DOMAINS
           value: "localhost"
-        - name: DATABASE_URL
-          value: "{{ .Values.database_connection }}"
         - name: REDIS_URL
           value: "{{ .Values.redis_connection }}"
         - name: SECRET_KEY_BASE
@@ -69,14 +130,29 @@ spec:
 
       - name: vault-auth
         image: "vault:{{ .Values.vault_version }}"
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         command: ["vault"]
-        args: ["agent","-address","http://vault.service.consul:8200","-config","/etc/vault.d/auto-auth.config"]
+        args: ["agent","-address","http://vault.service.consul:8200","-config","/etc/config/auto-auth.hcl"]
         volumeMounts:
-        - name: vault-auth-config-file
-          mountPath: /etc/vault.d
-      volumes:
-      - name: vault-auth-config-file
-        configMap:
-          name: vault-auth-configmap
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
+        - name: vault-token
+          mountPath: /var/run/secrets/vault-token
+
+      - name: consul-template
+        image: "hashicorp/consul-template:alpine"
+        imagePullPolicy: IfNotPresent
+        command: ["/bin/sh"]
+        args: ["-c", "VAULT_TOKEN=$(cat /var/run/secrets/vault-token/token.txt) /bin/consul-template -config /etc/config/consultemplate.hcl"]
+        volumeMounts:
+        - name: secrets
+          mountPath: /var/run/secrets/vault
+          readOnly: false
+        - name: vault-token
+          mountPath: /var/run/secrets/vault-token
+          readOnly: true
+        - name: config
+          mountPath: /etc/config
+          readOnly: true
 
