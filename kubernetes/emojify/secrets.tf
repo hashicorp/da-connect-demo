@@ -15,14 +15,14 @@ data "template_file" "provision_secrets" {
 
 resource "null_resource" "provision_secrets" {
   triggers {
-    private_key_id = "${data.terraform_remote_state.core.vault_key}"
+    private_key_id = "${data.terraform_remote_state.core.jumpbox_key}"
   }
 
   connection {
-    host        = "${data.terraform_remote_state.core.vault_host}"
+    host        = "${data.terraform_remote_state.core.jumpbox_host}"
     type        = "ssh"
     user        = "ubuntu"
-    private_key = "${data.terraform_remote_state.core.vault_key}"
+    private_key = "${data.terraform_remote_state.core.jumpbox_key}"
     agent       = false
   }
 

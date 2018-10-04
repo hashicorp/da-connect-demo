@@ -17,9 +17,10 @@ data "template_file" "provision_secrets" {
 
 resource "null_resource" "provision_secrets" {
   triggers {
-    vault_id       = "${azurerm_virtual_machine.vault.id}"
-    private_key_id = "${tls_private_key.vault.id}"
-    consul         = "${helm_release.consul.id}"
+    vault_id           = "${azurerm_virtual_machine.vault.id}"
+    provision_vault_id = "${null_resource.provision_vault.id}"
+    private_key_id     = "${tls_private_key.vault.id}"
+    consul             = "${helm_release.consul.id}"
   }
 
   connection {

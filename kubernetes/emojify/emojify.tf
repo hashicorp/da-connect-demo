@@ -18,6 +18,8 @@ provider "helm" {
 
 # Start our application
 resource "helm_release" "emojify" {
+  depends_on = ["null_resource.provision_secrets"]
+
   name    = "emojify"
   chart   = "${path.module}/helm_charts/emojify_helm"
   timeout = 600
