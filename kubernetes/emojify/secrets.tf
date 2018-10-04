@@ -1,17 +1,40 @@
-/*
-provider "vault" {
-  address = "http://${var.vault_ip}:8200"
-  token   = "${var.vault_token}"
+# Setup the intial Vault secrets required to enable the K8s auth and 
+# dynamic secrets for our applicaton
+data "template_file" "provision_secrets" {
+  template = "${file("${path.module}/scripts/provision_secrets.sh")}"
+
+  vars {
+    redis_key    = "${azurerm_redis_cache.emojify_cache.primary_access_key}"
+    redis_server = "${azurerm_redis_cache.emojify_cache.hostname}"
+    db_server    = "${azurerm_postgresql_server.emojify_db.fqdn}"
+    db_database  = "keratin"
+    db_username  = "${azurerm_postgresql_server.emojify_db.administrator_login}"
+    db_password  = "${azurerm_postgresql_server.emojify_db.administrator_login_password}"
+  }
 }
 
-resource "vault_generic_secret" "emojify" {
-  path = "secret/emojify"
+resource "null_resource" "provision_secrets" {
+  triggers {
+    private_key_id = "${data.terraform_remote_state.core.vault_key}"
+  }
 
-  data_json = <<EOT
-{
-  "machinebox_key":   "${var.machinebox_key}"
-}
-EOT
-}
-*/
+  connection {
+    host        = "${data.terraform_remote_state.core.vault_host}"
+    type        = "ssh"
+    user        = "ubuntu"
+    private_key = "${data.terraform_remote_state.core.vault_key}"
+    agent       = false
+  }
 
+  provisioner "file" {
+    content     = "${data.template_file.provision_secrets.rendered}"
+    destination = "/tmp/provision_secrets.sh"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "chmod +x /tmp/provision_secrets.sh",
+      "sudo /tmp/provision_secrets.sh",
+    ]
+  }
+}

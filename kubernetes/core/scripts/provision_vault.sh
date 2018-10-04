@@ -24,7 +24,7 @@ tee /etc/systemd/system/vault.service > /dev/null <<"EOF"
   
   [Service]
   KillSignal=INT
-  ExecStart=/usr/local/bin/vault server -dev -dev-root-token-id=mytoken -dev-listen-address=${vault_listen_address}
+  ExecStart=/usr/local/bin/vault server -dev -dev-root-token-id=mytoken -dev-listen-address=0.0.0.0:8200
   Restart=always
 EOF
 

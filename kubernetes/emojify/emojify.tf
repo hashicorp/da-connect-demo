@@ -18,11 +18,9 @@ provider "helm" {
 
 # Start our application
 resource "helm_release" "emojify" {
-  name          = "emojify"
-  chart         = "${path.module}/helm_charts/emojify_helm"
-  timeout       = 500
-  recreate_pods = true
-  version       = "0.1.0"
+  name    = "emojify"
+  chart   = "${path.module}/helm_charts/emojify_helm"
+  timeout = 600
 
   set {
     name  = "machinebox_key"
@@ -39,6 +37,3 @@ resource "helm_release" "emojify" {
     value = "redis://user:${azurerm_redis_cache.emojify_cache.primary_access_key}@${azurerm_redis_cache.emojify_cache.hostname}:${azurerm_redis_cache.emojify_cache.port}/0"
   }
 }
-
-#        args: ["-c", "VAULT_TOKEN=$(cat /var/run/secrets/vault/token.txt) /bin/envconsul -config /etc/config/envconsul.hcl"]
-

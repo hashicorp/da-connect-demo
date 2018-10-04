@@ -44,6 +44,12 @@ open_consul_ui: get_k8s_config
 	@open "http://localhost:8080/ui"
 	@bash -c "trap 'pkill -F .pid_kube_ports' SIGINT SIGTERM ERR EXIT; sleep 20000"
 
+open_vault_ui: tunnel_vault_start
+	@echo "Opening Vault UI, To quit, press Ctrl-C"
+	@sleep 3
+	@open "http://localhost:8202/ui"
+	@bash -c "trap 'ssh -S vault-ctrl-socket -O exit ubuntu@$(shell terraform output -state=./core/terraform.tfstate vault_host)' SIGINT SIGTERM ERR EXIT; sleep 20000"
+
 # Open the application in your browser
 open_app: get_k8s_config
 	@echo "Opening application homepage"

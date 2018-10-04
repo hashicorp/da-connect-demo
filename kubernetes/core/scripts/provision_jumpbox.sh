@@ -57,24 +57,6 @@ data:
     {"consul": ["$(KUBECONFIG=/home/ubuntu/.kube/config kubectl get svc consul-dns -o jsonpath='{.spec.clusterIP}')"]}
 EOF
 
-# Enable Kubernetes Service Account to access Token Review API
-cat <<EOF | KUBECONFIG=/home/ubuntu/.kube/config kubectl apply -f -
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: role-tokenreview-binding
-  namespace: default
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: system:auth-delegator
-subjects:
-- kind: ServiceAccount
-  name: vault-auth
-  namespace: default
-EOF
-
-
 # Configure DNSMasq
 tee /etc/dnsmasq.d/10_consul > /dev/null <<"EOF"
 no-resolv
@@ -84,7 +66,41 @@ EOF
 
 systemctl restart dnsmasq
 
+# Configure Vault Auto Auth
+tee /home/ubuntu/.vault-auto-auth > /dev/null <<"EOF"
+    "auto_auth" {
+      method "azure" {
+        config {
+          role = "jumpbox-role"
+					resource = "https://management.azure.com/"
+        }
+      }
+
+      sink "file" {
+        config {
+          path = "/home/ubuntu/.vault_token"
+        }
+      }
+    }
+EOF
+
+# We need the auto auto to run as user ubuntu otherwise the file containing the 
+# vault token will not be readable without sudo
+tee /etc/systemd/system/vault-auto-auth.service > /dev/null <<"EOF"
+  [Unit]
+  Description = "Vault Auto Auth"
+  
+  [Service]
+  User=ubuntu
+  KillSignal=INT
+  ExecStart=/usr/local/bin/vault agent -address http://vault.service.consul:8200 -config /home/ubuntu/.vault-auto-auth
+  Restart=always
+EOF
+
+systemctl enable vault-auto-auth.service
+systemctl start vault-auto-auth.service
+
 # Update profile
 echo "export KUBECONFIG=/home/ubuntu/.kube/config" >> /home/ubuntu/.profile
 echo "export VAULT_ADDR=http://vault.service.consul:8200" >> /home/ubuntu/.profile
-echo "export VAULT_TOKEN=${vault_token}" >> /home/ubuntu/.profile
+echo 'export VAULT_TOKEN=$(cat /home/ubuntu/.vault_token)' >> /home/ubuntu/.profile

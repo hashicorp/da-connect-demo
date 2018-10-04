@@ -14,9 +14,12 @@ variable "cluster_name" {
   default = "emojify"
 }
 
+# Azure API details
 variable "client_id" {}
 
 variable "client_secret" {}
+
+variable "tennant_id" {}
 
 variable "vault_token" {
   description = "Vault dev token to setup"
