@@ -7,10 +7,10 @@ spec:
   selector:
     app: router
   ports:
-  - name: http
-    protocol: TCP
-    port: 80
-    targetPort: 8181
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 8181
   type: LoadBalancer
 
 ---
@@ -21,7 +21,7 @@ metadata:
   labels:
     app: router
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: router
@@ -31,17 +31,17 @@ spec:
         app: router
     spec:
       containers:
-      - name: router
-        image: nicholasjackson/consul-connect-router:latest
-        imagePullPolicy: Always
-        args: [
-          '--upstream=emojify-website#/',
-          '--upstream=emojify-api#/api',
-          '--consul_addr=http://$(HOST_IP):8500'
+        - name: router
+          image: nicholasjackson/consul-connect-router:latest
+          imagePullPolicy: Always
+          args: [
+            '--upstream=service=emojify-website#path=/',
+            '--upstream=service=emojify-api#path=/api',
+            '--upstream=service=emojify-auth#path=/auth',
+            '--consul_addr=http://$(HOST_IP):8500'
           ]
-        env:
-        - name: HOST_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.hostIP
-
+          env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP

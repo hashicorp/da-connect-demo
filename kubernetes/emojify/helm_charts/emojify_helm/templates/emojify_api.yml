@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
@@ -5,7 +6,7 @@ metadata:
   labels:
     app: emojify-api
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: emojify-api
@@ -15,33 +16,39 @@ spec:
         app: emojify-api
     spec:
       containers:
-      - name: emojify-api
-        image: "nicholasjackson/emojify-api:latest"
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 9090
-        env:
-        - name: FACEBOX
-          value: http://localhost:8080
-      - name: emojify-api-proxy
-        image: nicholasjackson/consul_connect_agent:latest
-        command: ['/usr/local/bin/consul', 'connect', 'proxy']
-        args: [
-          '-log-level=DEBUG',
-          '-service','emojify-api',
-          '-http-addr','$(HOST_IP):8500',
-          '-register',
-          '-listen','$(POD_IP):8443',
-          '-service-addr','localhost:9090',
-          '-upstream', 'emojify-facebox:8080'
+        - name: emojify-api
+          image: "nicholasjackson/emojify-api:latest"
+          imagePullPolicy: Always
+          command: ["/service/emojify-api"]
+          args: [
+            "-allow-origin=http://xn--emjify-4v74e.ws",
+            "-authn-server=http://localhost:3000",
+            "-authn-audience=xn--emjify-4v74e.ws"
           ]
-        env:
-        - name: HOST_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.hostIP
-        - name: POD_IP
-          valueFrom:
-            fieldRef:
-              fieldPath: status.podIP
-
+          ports:
+            - containerPort: 9090
+          env:
+            - name: FACEBOX
+              value: http://localhost:8080
+        - name: emojify-api-proxy
+          image: nicholasjackson/consul_connect_agent:latest
+          command: ['/usr/local/bin/consul', 'connect', 'proxy']
+          args: [
+            '-log-level=DEBUG',
+            '-service', 'emojify-api',
+            '-http-addr', '$(HOST_IP):8500',
+            '-register',
+            '-listen', '$(POD_IP):8443',
+            '-service-addr', 'localhost:9090',
+            '-upstream', 'emojify-facebox:8080',
+            '-upstream', 'emojify-auth:3000'
+          ]
+          env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP

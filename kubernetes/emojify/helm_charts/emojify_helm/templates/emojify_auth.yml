@@ -48,8 +48,8 @@ data:
     SECRET_KEY_BASE=(( .Data.data.keratin_key_base ))
     HTTP_AUTH_USERNAME=(( .Data.data.keratin_auth_username ))
     HTTP_AUTH_PASSWORD=(( .Data.data.keratin_auth_password ))(( end ))
-    AUTHN_URL=localhost:8080
-    APP_DOMAINS=localhost
+    AUTHN_URL=http://localhost:3000
+    APP_DOMAINS=xn--emjify-4v74e.ws
 
   keratin-startup: |
     #!/bin/sh -e
@@ -106,11 +106,11 @@ spec:
           emptyDir: {}
 
       containers:
-        - name: keratin
+        - name: emojify-auth
           image: "keratin/authn-server:latest"
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
+            - containerPort: 3000
           command: ["/bin/sh"]
           args: ["/scripts/startup.sh"]
           volumeMounts:
@@ -120,6 +120,27 @@ spec:
             - name: keratin-startup
               mountPath: /scripts
               readOnly: false
+
+        - name: emojify-auth-proxy
+          image: nicholasjackson/consul_connect_agent:latest
+          command: ['/usr/local/bin/consul', 'connect', 'proxy']
+          args: [
+            "-log-level=DEBUG",
+            "-service", "emojify-auth",
+            "-http-addr", "$(HOST_IP):8500",
+            "-register",
+            "-listen", "$(POD_IP):8443",
+            "-service-addr", "localhost:3000"
+          ]
+          env:
+            - name: HOST_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
 
         - name: vault-auth
           image: "vault:{{ .Values.vault_version }}"

@@ -27,7 +27,7 @@ output "k8s_host" {
 }
 
 output "vault_host" {
-  value = "${azurerm_public_ip.vault.ip_address}"
+  value = "${data.azurerm_public_ip.vault.ip_address}"
 }
 
 output "vault_key" {
@@ -35,7 +35,7 @@ output "vault_key" {
 }
 
 output "jumpbox_host" {
-  value = "${azurerm_public_ip.jumpbox.ip_address}"
+  value = "${data.azurerm_public_ip.jumpbox.ip_address}"
 }
 
 output "jumpbox_key" {

@@ -38,10 +38,10 @@ open_dashboard: get_k8s_config
 
 # Open the Consul UI, runs kubectl port forward in the background
 open_consul_ui: get_k8s_config
-	@KUBECONFIG=$(shell pwd)/kube_config.yml kubectl port-forward svc/consul-ui 8080:80 & echo $$! > .pid_kube_ports
+	@KUBECONFIG=$(shell pwd)/kube_config.yml kubectl port-forward svc/consul-ui 8502:80 & echo $$! > .pid_kube_ports
 	@echo "Opening Consul UI, To quit, press Ctrl-C"
 	@sleep 3
-	@open "http://localhost:8080/ui"
+	@open "http://localhost:8502/ui"
 	@bash -c "trap 'pkill -F .pid_kube_ports' SIGINT SIGTERM ERR EXIT; sleep 20000"
 
 open_vault_ui: tunnel_vault_start

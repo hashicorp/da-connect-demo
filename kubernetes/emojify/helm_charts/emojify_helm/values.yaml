@@ -1,4 +1,3 @@
+---
 machinebox_key: ""
-database_connection: ""
-redis_connection: ""
 vault_version: "0.11.1"
