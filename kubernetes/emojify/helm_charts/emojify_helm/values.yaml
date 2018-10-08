@@ -1,3 +1,10 @@
 ---
 machinebox_key: ""
+domain: ""
 vault_version: "0.11.1"
+scheme: "https"
+auth_replicas: 1
+api_replicas: 1
+router_replicas: 1
+website_replicas: 1
+facebox_replicas: 1

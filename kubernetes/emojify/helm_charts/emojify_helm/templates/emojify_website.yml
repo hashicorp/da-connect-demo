@@ -6,7 +6,7 @@ metadata:
   labels:
     app: emojify-website
 spec:
-  replicas: 1
+  replicas: {{.Values.website_replicas}}
   selector:
     matchLabels:
       app: emojify-website

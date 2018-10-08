@@ -6,7 +6,7 @@ metadata:
   labels:
     app: emojify-api
 spec:
-  replicas: 1
+  replicas: {{.Values.api_replicas}}
   selector:
     matchLabels:
       app: emojify-api
@@ -21,9 +21,9 @@ spec:
           imagePullPolicy: Always
           command: ["/service/emojify-api"]
           args: [
-            "-allow-origin=http://xn--emjify-4v74e.ws",
+            "-allow-origin={{ .Values.scheme }}://{{ .Values.domain }}",
             "-authn-server=http://localhost:3000",
-            "-authn-audience=xn--emjify-4v74e.ws"
+            "-authn-audience={{ .Values.domain }}"
           ]
           ports:
             - containerPort: 9090

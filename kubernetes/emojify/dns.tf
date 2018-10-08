@@ -5,6 +5,7 @@ data "azurerm_public_ips" "kubernetes" {
   depends_on          = ["helm_release.emojify"]
 }
 
+/*
 resource "dnsimple_record" "emojify" {
   domain = "${var.dnsimple_domain}"
   name   = ""
@@ -20,3 +21,5 @@ resource "dnsimple_record" "emojify_api" {
   type   = "A"
   ttl    = 60
 }
+*/
+

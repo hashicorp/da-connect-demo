@@ -49,7 +49,7 @@ data:
     HTTP_AUTH_USERNAME=(( .Data.data.keratin_auth_username ))
     HTTP_AUTH_PASSWORD=(( .Data.data.keratin_auth_password ))(( end ))
     AUTHN_URL=http://localhost:3000
-    APP_DOMAINS=xn--emjify-4v74e.ws
+    APP_DOMAINS={{ .Values.domain }}
 
   keratin-startup: |
     #!/bin/sh -e
@@ -72,7 +72,7 @@ metadata:
   labels:
     app: emojify-auth
 spec:
-  replicas: 1
+  replicas: {{.Values.auth_replicas}}
   selector:
     matchLabels:
       app: emojify-auth

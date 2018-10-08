@@ -23,10 +23,15 @@ resource "helm_release" "emojify" {
   name    = "emojify"
   chart   = "${path.module}/helm_charts/emojify_helm"
   timeout = 600
-  version = "v0.1.15"
+  version = "v0.1.16"
 
   set {
     name  = "machinebox_key"
     value = "${var.machinebox_key}"
+  }
+
+  set {
+    name  = "domain"
+    value = "${var.domain}"
   }
 }
