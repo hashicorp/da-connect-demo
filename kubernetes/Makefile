@@ -1,12 +1,24 @@
+install_helm_provider: install_helm_provider_darwin install_helm_provider_linux
+
 # Install the helm provider from the community repository
-install_helm_provider:
+install_helm_provider_linux:
+	mkdir -p ./core/.terraform/plugins/linux_amd64
+	mkdir -p ./emojify/.terraform/plugins/linux_amd64
+	wget https://github.com/mcuadros/terraform-provider-helm/releases/download/v0.6.0/terraform-provider-helm_v0.6.0_linux_amd64.tar.gz
+	tar -xvf terraform-provider-helm*.tar.gz
+	cp ./terraform-provider-helm_linux_amd64/terraform-provider-helm ./core/.terraform/plugins/linux_amd64
+	cp ./terraform-provider-helm_linux_amd64/terraform-provider-helm ./emojify/.terraform/plugins/linux_amd64
+	rm ./terraform-provider-helm_v0.6.0_linux_amd64.tar.gz
+	rm -rf ./terraform-provider-helm_linux_amd64
+
+install_helm_provider_darwin:
 	mkdir -p ./core/.terraform/plugins/darwin_amd64
 	mkdir -p ./emojify/.terraform/plugins/darwin_amd64
-	wget https://github.com/mcuadros/terraform-provider-helm/releases/download/v0.5.1/terraform-provider-helm_v0.5.1_darwin_amd64.tar.gz
+	wget https://github.com/mcuadros/terraform-provider-helm/releases/download/v0.6.0/terraform-provider-helm_v0.6.0_darwin_amd64.tar.gz
 	tar -xvf terraform-provider-helm*.tar.gz
 	cp ./terraform-provider-helm_darwin_amd64/terraform-provider-helm ./core/.terraform/plugins/darwin_amd64
 	cp ./terraform-provider-helm_darwin_amd64/terraform-provider-helm ./emojify/.terraform/plugins/darwin_amd64
-	rm ./terraform-provider-helm_v0.5.1_darwin_amd64.tar.gz
+	rm ./terraform-provider-helm_v0.6.0_darwin_amd64.tar.gz
 	rm -rf ./terraform-provider-helm_darwin_amd64
 
 # Terraform apply the core infrastructure, creates the Kubernetes, Vault, Consul setup
