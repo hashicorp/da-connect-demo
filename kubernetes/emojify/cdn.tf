@@ -12,7 +12,6 @@ resource "cloudflare_record" "root" {
   name    = "@"
   value   = "${data.azurerm_public_ips.kubernetes.public_ips.0.ip_address}"
   type    = "A"
-  ttl     = 360
   proxied = true
 }
 
@@ -21,6 +20,5 @@ resource "cloudflare_record" "api" {
   name    = "api"
   value   = "${data.azurerm_public_ips.kubernetes.public_ips.0.ip_address}"
   type    = "A"
-  ttl     = 360
   proxied = true
 }

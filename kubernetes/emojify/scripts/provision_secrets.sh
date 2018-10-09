@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 export VAULT_ADDR=http://vault.service.consul:8200
 export VAULT_TOKEN=$(cat /home/ubuntu/.vault_token)
 
@@ -38,7 +38,9 @@ vault kv put secret/emojify-auth \
 	db_server=${db_server} \
 	keratin_key_base=my-authn-test-secret \
 	keratin_auth_username=hello \
-	keratin_auth_password=password
+	keratin_auth_password=password \
+    github_auth_client_id=${github_auth_client_id} \
+    github_auth_client_secret=${github_auth_client_secret}
 
 ## Create policy allowing access to the db-role and k8s auth
 tee ./policy.hcl > /dev/null <<"EOF"

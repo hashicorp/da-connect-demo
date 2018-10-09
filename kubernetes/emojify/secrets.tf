@@ -4,12 +4,14 @@ data "template_file" "provision_secrets" {
   template = "${file("${path.module}/scripts/provision_secrets.sh")}"
 
   vars {
-    redis_key    = "${azurerm_redis_cache.emojify_cache.primary_access_key}"
-    redis_server = "${azurerm_redis_cache.emojify_cache.hostname}"
-    db_server    = "${azurerm_postgresql_server.emojify_db.fqdn}"
-    db_database  = "keratin"
-    db_username  = "${azurerm_postgresql_server.emojify_db.administrator_login}"
-    db_password  = "${azurerm_postgresql_server.emojify_db.administrator_login_password}"
+    redis_key                 = "${azurerm_redis_cache.emojify_cache.primary_access_key}"
+    redis_server              = "${azurerm_redis_cache.emojify_cache.hostname}"
+    db_server                 = "${azurerm_postgresql_server.emojify_db.fqdn}"
+    db_database               = "keratin"
+    db_username               = "${azurerm_postgresql_server.emojify_db.administrator_login}"
+    db_password               = "${azurerm_postgresql_server.emojify_db.administrator_login_password}"
+    github_auth_client_id     = "${var.github_auth_client_id}"
+    github_auth_client_secret = "${var.github_auth_client_secret}"
   }
 }
 
