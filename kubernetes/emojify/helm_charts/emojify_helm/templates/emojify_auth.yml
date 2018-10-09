@@ -45,12 +45,12 @@ data:
 
     (( with secret "secret/data/emojify-auth" ))
     REDIS_URL=redis://user:(( .Data.data.redis_key ))@(( .Data.data.redis_server )):6379/0
+    GITHUB_OAUTH_CREDENTIALS=(( .Data.data.github_auth_client_id )):(( .Data.data.github_auth_client_secret ))
     SECRET_KEY_BASE=(( .Data.data.keratin_key_base ))
     HTTP_AUTH_USERNAME=(( .Data.data.keratin_auth_username ))
     HTTP_AUTH_PASSWORD=(( .Data.data.keratin_auth_password ))(( end ))
     AUTHN_URL=http://localhost:3000
     APP_DOMAINS={{ .Values.domain }}
-    GITHUB_OAUTH_CREDENTIALS=(( .Data.data.github_auth_client_id )):(( .Data.data.github_auth_client_secret ))
 
   keratin-startup: |
     #!/bin/sh -e
