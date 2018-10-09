@@ -9,3 +9,7 @@ variable "domain" {
 variable "cloudflare_zone_id" {
   default = "em😀jify.ws"
 }
+
+variable "github_auth_client_id" {}
+
+variable "github_auth_client_secret" {}

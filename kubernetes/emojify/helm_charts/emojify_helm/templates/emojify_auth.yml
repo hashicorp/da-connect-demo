@@ -50,6 +50,7 @@ data:
     HTTP_AUTH_PASSWORD=(( .Data.data.keratin_auth_password ))(( end ))
     AUTHN_URL=http://localhost:3000
     APP_DOMAINS={{ .Values.domain }}
+    GITHUB_OAUTH_CREDENTIALS=(( .Data.data.github_auth_client_id )):(( .Data.data.github_auth_client_secret ))
 
   keratin-startup: |
     #!/bin/sh -e

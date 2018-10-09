@@ -89,7 +89,7 @@ tunnel_vault_stop:
 # Open an SSH session to the Jumpbox server
 ssh_jumpbox: get_jumpbox_private_key
 	@echo "Logging into Jumpbox server"
-	@ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ./jumpbox_key.pem ubuntu@$(call terraform_output,jumpbox_host)
+	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ./jumpbox_key.pem ubuntu@$(shell cd core && terraform output jumpbox_host)
 
 # Fetch the kubernetes config from the core state
 get_k8s_config:
