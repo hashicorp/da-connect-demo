@@ -1,8 +1,14 @@
+terraform {
+  backend "atlas" {
+    name = "niccorp/emojify-app"
+  }
+}
+
 data "terraform_remote_state" "core" {
-  backend = "local"
+  backend = "atlas"
 
   config {
-    path = "${path.module}/../core/terraform.tfstate"
+    name = "niccorp/emojify-core"
   }
 }
 
@@ -33,5 +39,30 @@ resource "helm_release" "emojify" {
   set {
     name  = "domain"
     value = "${var.domain}"
+  }
+
+  set {
+    name  = "auth_replicas"
+    value = "1"
+  }
+
+  set {
+    name  = "api_replicas"
+    value = "2"
+  }
+
+  set {
+    name  = "router_replicas"
+    value = "2"
+  }
+
+  set {
+    name  = "website_replicas"
+    value = "2"
+  }
+
+  set {
+    name  = "facebox_replicas"
+    value = "2"
   }
 }

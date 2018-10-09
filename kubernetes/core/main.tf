@@ -1,3 +1,9 @@
+terraform {
+  backend "atlas" {
+    name = "niccorp/emojify-core"
+  }
+}
+
 resource "azurerm_resource_group" "core" {
   name     = "${var.resource_group_name}"
   location = "${var.location}"
