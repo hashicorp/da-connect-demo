@@ -10,8 +10,46 @@ spec:
     - name: http
       protocol: TCP
       port: 80
-      targetPort: 8181
+      targetPort: 80
   type: LoadBalancer
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: emojify-nginx-configmap
+data:
+  config: |
+    events {
+      worker_connections  4096;  ## Default: 1024
+    }
+
+    http {
+      upstream emojify-website {
+        server localhost:8000;
+      }
+
+      upstream emojify-auth {
+        server localhost:8001;
+      }
+
+      server {
+
+        location / {
+          proxy_pass http://emojify-website;
+          proxy_set_header Host $host;
+        }
+
+        location ~ ^/auth(/?)(.*) {
+          proxy_pass http://emojify-auth/$2;
+          proxy_set_header Host $host;
+          proxy_set_header Origin {{ .Values.api }};
+          proxy_pass_request_headers on;
+        }
+
+      }
+    }
 
 ---
 apiVersion: apps/v1
@@ -30,15 +68,34 @@ spec:
       labels:
         app: router
     spec:
+      volumes:
+        - name: config
+          configMap:
+            name: emojify-nginx-configmap
+            items:
+              - key: config
+                path: nginx.conf
+
       containers:
         - name: router
-          image: nicholasjackson/consul-connect-router:latest
-          imagePullPolicy: Always
+          image: nginx:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: config
+              mountPath: /etc/nginx/
+              readOnly: true
+
+        - name: emojify-nginx-proxy
+          image: nicholasjackson/consul_connect_agent:latest
+          command: ['/usr/local/bin/consul', 'connect', 'proxy']
           args: [
-            '--upstream=service=emojify-website#path=/',
-            '--upstream=service=emojify-api#path=/api',
-            '--upstream=service=emojify-auth#path=/auth',
-            '--consul_addr=http://$(HOST_IP):8500'
+            '-log-level=DEBUG',
+            '-service', 'nginx',
+            '-http-addr', '$(HOST_IP):8500',
+            '-upstream', 'emojify-website:8000',
+            '-upstream', 'emojify-auth:8001'
           ]
           env:
             - name: HOST_IP

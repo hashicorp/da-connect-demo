@@ -49,7 +49,7 @@ data:
     SECRET_KEY_BASE=(( .Data.data.keratin_key_base ))
     HTTP_AUTH_USERNAME=(( .Data.data.keratin_auth_username ))
     HTTP_AUTH_PASSWORD=(( .Data.data.keratin_auth_password ))(( end ))
-    AUTHN_URL=http://localhost:3000
+    AUTHN_URL={{ .Values.api }}
     APP_DOMAINS={{ .Values.domain }}
 
   keratin-startup: |
@@ -108,7 +108,7 @@ spec:
 
       containers:
         - name: emojify-auth
-          image: "keratin/authn-server:latest"
+          image: "nicholasjackson/authn-server:latest"
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000

@@ -1,4 +1,16 @@
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: emojify-web-configmap
+data:
+  config: |
+    window.env = {};
+    window.env.config = {
+      API_URL: '{{ .Values.api }}'
+    };
+
+---
 apiVersion: apps/v1
 kind: ReplicaSet
 metadata:
@@ -15,12 +27,24 @@ spec:
       labels:
         app: emojify-website
     spec:
+      volumes:
+        - name: config
+          configMap:
+            name: emojify-web-configmap
+            items:
+              - key: config
+                path: env.js
       containers:
         - name: emojify-website
           image: "nicholasjackson/emojify-website:latest"
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
+          volumeMounts:
+            - name: config
+              mountPath: /app/build/config/
+              readOnly: true
+
         - name: emojify-website-proxy
           image: nicholasjackson/consul_connect_agent:latest
           command: ['/usr/local/bin/consul', 'connect', 'proxy']

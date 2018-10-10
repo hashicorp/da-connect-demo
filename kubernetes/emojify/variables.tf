@@ -6,6 +6,12 @@ variable "domain" {
   default = "xn--emjify-4v74e.ws"
 }
 
+/*
+variable "domain" {
+  default = "demo.gs"
+}
+
+*/
 variable "cloudflare_zone_id" {
   default = "em😀jify.ws"
 }

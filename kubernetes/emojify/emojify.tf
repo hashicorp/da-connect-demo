@@ -29,7 +29,7 @@ resource "helm_release" "emojify" {
   name    = "emojify"
   chart   = "${path.module}/helm_charts/emojify_helm"
   timeout = 600
-  version = "v0.1.17"
+  version = "0.3.0"
 
   set {
     name  = "machinebox_key"
@@ -42,13 +42,23 @@ resource "helm_release" "emojify" {
   }
 
   set {
+    name  = "version"
+    value = "0.1.4"
+  }
+
+  set {
+    name  = "api"
+    value = "https://${var.domain}"
+  }
+
+  set {
     name  = "auth_replicas"
     value = "1"
   }
 
   set {
     name  = "api_replicas"
-    value = "2"
+    value = "1"
   }
 
   set {

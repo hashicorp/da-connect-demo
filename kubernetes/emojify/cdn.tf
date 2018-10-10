@@ -14,11 +14,3 @@ resource "cloudflare_record" "root" {
   type    = "A"
   proxied = true
 }
-
-resource "cloudflare_record" "api" {
-  domain  = "${var.cloudflare_zone_id}"
-  name    = "api"
-  value   = "${data.azurerm_public_ips.kubernetes.public_ips.0.ip_address}"
-  type    = "A"
-  proxied = true
-}

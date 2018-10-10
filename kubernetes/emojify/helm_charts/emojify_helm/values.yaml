@@ -1,6 +1,8 @@
 ---
 machinebox_key: ""
 domain: ""
+api: ""
+version: ""
 vault_version: "0.11.1"
 scheme: "https"
 auth_replicas: 1
