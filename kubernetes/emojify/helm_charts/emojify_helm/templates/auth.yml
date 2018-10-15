@@ -6,6 +6,22 @@ metadata:
 
 ---
 apiVersion: v1
+kind: Service
+metadata:
+  name: emojify-auth
+spec:
+  selector:
+    app: emojify-auth
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 3000
+  loadBalancerIP: {{.Values.auth_ip}}
+  type: LoadBalancer
+
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: emojify-auth-configmap
@@ -49,8 +65,10 @@ data:
     SECRET_KEY_BASE=(( .Data.data.keratin_key_base ))
     HTTP_AUTH_USERNAME=(( .Data.data.keratin_auth_username ))
     HTTP_AUTH_PASSWORD=(( .Data.data.keratin_auth_password ))(( end ))
-    AUTHN_URL={{ .Values.api }}
+    AUTHN_URL=http://localhost:8002
     APP_DOMAINS={{ .Values.domain }}
+    PUBLIC_PORT=3000
+    PORT=3001
 
   keratin-startup: |
     #!/bin/sh -e
@@ -67,7 +85,7 @@ data:
 
 ---
 apiVersion: apps/v1
-kind: ReplicaSet
+kind: Deployment
 metadata:
   name: emojify-auth
   labels:
@@ -81,6 +99,9 @@ spec:
     metadata:
       labels:
         app: emojify-auth
+      annotations:
+        "consul.hashicorp.com/connect-inject": "true"
+        "consul.hashicorp.com/connect-service-port": "3001"
     spec:
       serviceAccountName: emojify-auth
       automountServiceAccountToken: true
@@ -108,12 +129,12 @@ spec:
 
       containers:
         - name: emojify-auth
-          image: "nicholasjackson/authn-server:latest"
+          image: "keratin/authn-server:latest"
           imagePullPolicy: IfNotPresent
-          ports:
-            - containerPort: 3000
           command: ["/bin/sh"]
           args: ["/scripts/startup.sh"]
+          ports:
+            - containerPort: 3000
           volumeMounts:
             - name: secrets
               mountPath: /var/run/secrets/vault
@@ -121,27 +142,6 @@ spec:
             - name: keratin-startup
               mountPath: /scripts
               readOnly: false
-
-        - name: emojify-auth-proxy
-          image: nicholasjackson/consul_connect_agent:latest
-          command: ['/usr/local/bin/consul', 'connect', 'proxy']
-          args: [
-            "-log-level=DEBUG",
-            "-service", "emojify-auth",
-            "-http-addr", "$(HOST_IP):8500",
-            "-register",
-            "-listen", "$(POD_IP):8443",
-            "-service-addr", "localhost:3000"
-          ]
-          env:
-            - name: HOST_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
-            - name: POD_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
 
         - name: vault-auth
           image: "vault:{{ .Values.vault_version }}"

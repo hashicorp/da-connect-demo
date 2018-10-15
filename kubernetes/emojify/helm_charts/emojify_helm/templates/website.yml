@@ -7,12 +7,13 @@ data:
   config: |
     window.env = {};
     window.env.config = {
-      API_URL: '{{ .Values.api }}'
+      AUTH_URL: '{{ .Values.auth_uri }}',
+      API_URL: '{{ .Values.api_uri }}'
     };
 
 ---
 apiVersion: apps/v1
-kind: ReplicaSet
+kind: Deployment
 metadata:
   name: emojify-website
   labels:
@@ -26,6 +27,9 @@ spec:
     metadata:
       labels:
         app: emojify-website
+      annotations:
+        "consul.hashicorp.com/connect-inject": "true"
+        "consul.hashicorp.com/connect-service-port": "5000"
     spec:
       volumes:
         - name: config
@@ -38,30 +42,8 @@ spec:
         - name: emojify-website
           image: "nicholasjackson/emojify-website:latest"
           imagePullPolicy: Always
-          ports:
-            - containerPort: 5000
+
           volumeMounts:
             - name: config
               mountPath: /app/build/config/
               readOnly: true
-
-        - name: emojify-website-proxy
-          image: nicholasjackson/consul_connect_agent:latest
-          command: ['/usr/local/bin/consul', 'connect', 'proxy']
-          args: [
-            "-log-level=DEBUG",
-            "-service", "emojify-website",
-            "-http-addr", "$(HOST_IP):8500",
-            "-register",
-            "-listen", "$(POD_IP):8443",
-            "-service-addr", "localhost:5000"
-          ]
-          env:
-            - name: HOST_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.hostIP
-            - name: POD_IP
-              valueFrom:
-                fieldRef:
-                  fieldPath: status.podIP
