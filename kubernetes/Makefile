@@ -21,6 +21,13 @@ install_helm_provider_darwin:
 	rm ./terraform-provider-helm_v0.6.0_darwin_amd64.tar.gz
 	rm -rf ./terraform-provider-helm_darwin_amd64
 
+update_consul_helm_chart:
+	wget https://github.com/hashicorp/consul-helm/archive/v0.3.0.zip
+	unzip v0.3.0.zip
+	rm -rf ./core/helm_charts/consul_helm
+	mv consul-helm-0.3.0 ./core/helm_charts/consul_helm/
+	rm v0.3.0.zip
+
 # Terraform apply the core infrastructure, creates the Kubernetes, Vault, Consul setup
 apply_core:
 	cd core && terraform init
@@ -38,8 +45,8 @@ apply_emojify:
 
 # Terraform destroy the application infrastructure
 destroy_emojify:
-	cd core && terraform init
-	cd core && terraform destroy
+	cd emojify && terraform init
+	cd emojify && terraform destroy
 
 # Open the Kubernetes dashboard, runs kubectl proxy in the background
 open_dashboard: get_k8s_config

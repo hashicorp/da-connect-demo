@@ -29,7 +29,7 @@ resource "helm_release" "emojify" {
   name    = "emojify"
   chart   = "${path.module}/helm_charts/emojify_helm"
   timeout = 600
-  version = "v0.1.18"
+  version = "0.3.0"
 
   set {
     name  = "machinebox_key"
@@ -42,27 +42,52 @@ resource "helm_release" "emojify" {
   }
 
   set {
+    name  = "version"
+    value = "0.1.28"
+  }
+
+  set {
+    name  = "auth_uri"
+    value = "https://auth.${var.domain}"
+  }
+
+  set {
+    name  = "api_uri"
+    value = "https://${var.domain}/api"
+  }
+
+  set {
+    name  = "auth_ip"
+    value = "${azurerm_public_ip.auth_ip.ip_address}"
+  }
+
+  set {
+    name  = "router_ip"
+    value = "${azurerm_public_ip.router_ip.ip_address}"
+  }
+
+  set {
     name  = "auth_replicas"
     value = "1"
   }
 
   set {
     name  = "api_replicas"
-    value = "3"
+    value = "1"
   }
 
   set {
     name  = "router_replicas"
-    value = "2"
+    value = "1"
   }
 
   set {
     name  = "website_replicas"
-    value = "2"
+    value = "1"
   }
 
   set {
     name  = "facebox_replicas"
-    value = "2"
+    value = "1"
   }
 }

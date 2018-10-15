@@ -1,0 +1,49 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: emojify-web-configmap
+data:
+  config: |
+    window.env = {};
+    window.env.config = {
+      AUTH_URL: '{{ .Values.auth_uri }}',
+      API_URL: '{{ .Values.api_uri }}'
+    };
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: emojify-website
+  labels:
+    app: emojify-website
+spec:
+  replicas: {{.Values.website_replicas}}
+  selector:
+    matchLabels:
+      app: emojify-website
+  template:
+    metadata:
+      labels:
+        app: emojify-website
+      annotations:
+        "consul.hashicorp.com/connect-inject": "true"
+        "consul.hashicorp.com/connect-service-port": "5000"
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: emojify-web-configmap
+            items:
+              - key: config
+                path: env.js
+      containers:
+        - name: emojify-website
+          image: "nicholasjackson/emojify-website:latest"
+          imagePullPolicy: Always
+
+          volumeMounts:
+            - name: config
+              mountPath: /app/build/config/
+              readOnly: true

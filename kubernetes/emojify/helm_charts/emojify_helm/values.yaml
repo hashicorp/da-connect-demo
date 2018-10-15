@@ -1,6 +1,11 @@
 ---
 machinebox_key: ""
 domain: ""
+auth_uri: ""
+api_uri: ""
+auth_ip: ""
+router_ip: ""
+version: ""
 vault_version: "0.11.1"
 scheme: "https"
 auth_replicas: 1
