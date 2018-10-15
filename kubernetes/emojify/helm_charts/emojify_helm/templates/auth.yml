@@ -65,10 +65,8 @@ data:
     SECRET_KEY_BASE=(( .Data.data.keratin_key_base ))
     HTTP_AUTH_USERNAME=(( .Data.data.keratin_auth_username ))
     HTTP_AUTH_PASSWORD=(( .Data.data.keratin_auth_password ))(( end ))
-    AUTHN_URL=http://localhost:8002
+    AUTHN_URL={{ .Values.auth_uri }}
     APP_DOMAINS={{ .Values.domain }}
-    PUBLIC_PORT=3000
-    PORT=3001
 
   keratin-startup: |
     #!/bin/sh -e

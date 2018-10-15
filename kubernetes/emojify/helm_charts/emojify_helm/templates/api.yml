@@ -26,7 +26,7 @@ spec:
           command: ["/service/emojify-api"]
           args: [
             "-allow-origin={{ .Values.scheme }}://{{ .Values.domain }}",
-            "-authn-server=http://localhost:8002",
+            "-authn-server={{ .Values.auth_uri }}",
             "-authn-audience={{ .Values.domain }}"
           ]
           ports:
