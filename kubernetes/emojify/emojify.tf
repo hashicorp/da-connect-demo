@@ -43,7 +43,7 @@ resource "helm_release" "emojify" {
 
   set {
     name  = "version"
-    value = "0.1.28"
+    value = "0.1.32"
   }
 
   set {
@@ -54,6 +54,11 @@ resource "helm_release" "emojify" {
   set {
     name  = "api_uri"
     value = "https://${var.domain}/api"
+  }
+
+  set {
+    name  = "home_uri"
+    value = "https://${var.domain}"
   }
 
   set {

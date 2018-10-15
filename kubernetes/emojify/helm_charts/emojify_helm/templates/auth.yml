@@ -67,6 +67,7 @@ data:
     HTTP_AUTH_PASSWORD=(( .Data.data.keratin_auth_password ))(( end ))
     AUTHN_URL={{ .Values.auth_uri }}
     APP_DOMAINS={{ .Values.domain }}
+    ForceSSL=true
 
   keratin-startup: |
     #!/bin/sh -e

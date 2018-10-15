@@ -8,7 +8,8 @@ data:
     window.env = {};
     window.env.config = {
       AUTH_URL: '{{ .Values.auth_uri }}',
-      API_URL: '{{ .Values.api_uri }}'
+      API_URL: '{{ .Values.api_uri }}',
+      HOME_URL: '{{ .Values.home_uri }}'
     };
 
 ---
