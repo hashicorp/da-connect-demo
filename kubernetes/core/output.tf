@@ -26,6 +26,14 @@ output "k8s_host" {
   value = "${azurerm_kubernetes_cluster.k8s.kube_config.0.host}"
 }
 
+output "k8s_ingress_ip" {
+  value = "${azurerm_public_ip.ingress_ip.ip_address}"
+}
+
+output "k8s_ingress_fqdn" {
+  value = "${azurerm_public_ip.ingress_ip.fqdn}"
+}
+
 output "vault_host" {
   value = "${data.azurerm_public_ip.vault.ip_address}"
 }

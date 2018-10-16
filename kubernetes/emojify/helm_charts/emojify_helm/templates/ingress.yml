@@ -1,0 +1,48 @@
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: tls-secret
+spec:
+  secretName: tls-secret
+  dnsNames:
+  - {{.Values.ingress_fqdn}}
+  acme:
+    config:
+    - http01:
+        ingressClass: nginx
+      domains:
+      - {{.Values.ingress_fqdn}}
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: public-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+  - hosts:
+    - {{.Values.ingress_fqdn}}
+    secretName: tls-secret
+  rules:
+  - host: {{.Values.ingress_fqdn}}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: emojify-website
+          servicePort: 5000
+      - path: /auth
+        backend:
+          serviceName: emojify-auth
+          servicePort: 3000
+      - path: /api
+        backend:
+          serviceName: emojify-api
+          servicePort: 9090

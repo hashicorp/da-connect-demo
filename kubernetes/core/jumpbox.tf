@@ -100,11 +100,12 @@ data "template_file" "provision_jumpbox" {
   template = "${file("${path.module}/scripts/provision_jumpbox.sh")}"
 
   vars {
-    consul_version = "1.2.3"
-    vault_version  = "0.11.1"
-    kube_config    = "${azurerm_kubernetes_cluster.k8s.0.kube_config_raw}"
-    kube_ca_cert   = "${base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.cluster_ca_certificate)}"
-    vault_token    = "${var.vault_token}"
+    consul_version    = "1.2.3"
+    vault_version     = "0.11.1"
+    kube_config       = "${azurerm_kubernetes_cluster.k8s.0.kube_config_raw}"
+    kube_ca_cert      = "${base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.cluster_ca_certificate)}"
+    vault_token       = "${var.vault_token}"
+    letsencrypt_email = "${var.letsencrypt_email}"
   }
 }
 

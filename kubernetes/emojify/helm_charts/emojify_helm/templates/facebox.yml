@@ -19,8 +19,12 @@ spec:
         "consul.hashicorp.com/connect-service-port": "8080"
     spec:
       containers:
-        - name: emojify-facebox
-          image: "machinebox/facebox"
-          env:
-            - name: MB_KEY
-              value: "{{ .Values.machinebox_key }}"
+      - name: emojify-facebox
+        image: "machinebox/facebox"
+        env:
+        - name: MB_KEY
+          value: "{{ .Values.machinebox_key }}"
+        - name: MB_ADDRESS
+          value: "127.0.0.1"
+        - name: MB_PORT
+          value: "8080"

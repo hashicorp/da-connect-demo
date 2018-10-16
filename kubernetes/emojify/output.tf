@@ -31,3 +31,7 @@ output "redis_port" {
 output "redis_key" {
   value = "${azurerm_redis_cache.emojify_cache.primary_access_key}"
 }
+
+output "application_fqdn" {
+  value = "${data.terraform_remote_state.core.k8s_ingress_fqdn}"
+}

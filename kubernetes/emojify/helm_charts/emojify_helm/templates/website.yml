@@ -9,8 +9,25 @@ data:
     window.env.config = {
       AUTH_URL: '{{ .Values.auth_uri }}',
       API_URL: '{{ .Values.api_uri }}',
-      HOME_URL: '{{ .Values.home_uri }}'
+      HOME_URL: '{{ .Values.home_uri }}',
+      OAUTH_ENABLED: true
     };
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emojify-website
+  labels:
+    app: emojify-website
+spec:
+  ports:
+    - port: 5000
+      targetPort: 5000
+      protocol: TCP
+      name: http
+  selector:
+    app: emojify-website
 
 ---
 apiVersion: apps/v1
@@ -28,9 +45,6 @@ spec:
     metadata:
       labels:
         app: emojify-website
-      annotations:
-        "consul.hashicorp.com/connect-inject": "true"
-        "consul.hashicorp.com/connect-service-port": "5000"
     spec:
       volumes:
         - name: config
@@ -43,6 +57,10 @@ spec:
         - name: emojify-website
           image: "nicholasjackson/emojify-website:latest"
           imagePullPolicy: Always
+          command: ["serve"]
+          args: ["-s", "build"]
+          ports:
+            - containerPort: 5000
 
           volumeMounts:
             - name: config

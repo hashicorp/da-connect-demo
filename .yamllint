@@ -1,0 +1,10 @@
+extends: default
+
+rules:
+  line-length:
+    max: 160
+    level: warning
+
+  # don't bother me with this rule
+  indentation:
+    indent-sequences: false

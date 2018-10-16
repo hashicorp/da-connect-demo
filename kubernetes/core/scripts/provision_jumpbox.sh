@@ -57,6 +57,35 @@ data:
     {"consul": ["$(KUBECONFIG=/home/ubuntu/.kube/config kubectl get svc consul-dns -o jsonpath='{.spec.clusterIP}')"]}
 EOF
 
+# Enable Certmanager
+cat <<EOF | KUBECONFIG=/home/ubuntu/.kube/config kubectl apply -f -
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-staging
+spec:
+  acme:
+    server: https://acme-staging-v02.api.letsencrypt.org/directory
+    email: ${letsencrypt_email} 
+    privateKeySecretRef:
+      name: letsencrypt-staging
+    http01: {}
+
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    server: https://acme-v01.api.letsencrypt.org/directory
+    email: ${letsencrypt_email}
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    http01: {}
+EOF
+
 # Configure DNSMasq
 tee /etc/dnsmasq.d/10_consul > /dev/null <<"EOF"
 no-resolv

@@ -1,4 +1,20 @@
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: emojify-api
+  labels:
+    app: emojify-api
+spec:
+  ports:
+  - port: 9090
+    targetPort: 9090
+    protocol: TCP
+    name: http
+  selector:
+    app: emojify-api
+
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,17 +36,19 @@ spec:
         "consul.hashicorp.com/connect-service-port": "9090"
     spec:
       containers:
-        - name: emojify-api
-          image: "nicholasjackson/emojify-api:latest"
-          imagePullPolicy: Always
-          command: ["/service/emojify-api"]
-          args: [
-            "-allow-origin={{ .Values.scheme }}://{{ .Values.domain }}",
-            "-authn-server={{ .Values.auth_uri }}",
-            "-authn-audience={{ .Values.domain }}"
-          ]
-          ports:
-            - containerPort: 9090
-          env:
-            - name: FACEBOX
-              value: http://localhost:8003
+      - name: emojify-api
+        image: "nicholasjackson/emojify-api:latest"
+        imagePullPolicy: Always
+        command: ["/service/emojify-api"]
+        args: [
+          "-allow-origin={{ .Values.scheme }}://{{ .Values.domain }}",
+          "-authn-server={{ .Values.auth_uri }}",
+          "-authn-audience={{ .Values.domain }}",
+          "-bind-address=0.0.0.0:9090",
+          "-path=/api/"
+        ]
+        ports:
+        - containerPort: 9090
+        env:
+        - name: FACEBOX
+          value: http://localhost:8003

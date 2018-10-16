@@ -28,25 +28,49 @@ update_consul_helm_chart:
 	mv consul-helm-0.3.0 ./core/helm_charts/consul_helm/
 	rm v0.3.0.zip
 
+setup_remote_state:
+	@rm -rf ./remotestatebackend.tfvars
+	@rm -rf ./remotestatedata.tfvars
+
+	@echo "Type the name of the azure resource group where your storage account is located"
+	@read storage; \
+	  echo "resource_group_name = \"$${storage}\"" >> ./remotestatebackend.tfvars; \
+	  echo "remote_state_resource_group_name = \"$${storage}\"" >> ./remotestatedata.tfvars
+	@echo ""
+	
+	@echo "Type the name of the storage account to use for remote state"
+	@read storage; \
+	  echo "storage_account_name = \"$${storage}\"" >> ./remotestatebackend.tfvars; \
+	  echo "remote_state_storage_account_name = \"$${storage}\"" >> ./remotestatedata.tfvars
+	@echo ""
+	
+	@echo "Type the name of the container to use for remote state"
+	@read storage; \
+	  echo "container_name = \"$${storage}\"" >> ./remotestatebackend.tfvars; \
+	  echo "remote_state_container_name = \"$${storage}\"" >> ./remotestatedata.tfvars
+	@echo ""
+	@echo "Remote state setup, you can modify remotestatebackend.tfvars and remotestatedata.tfvars if needed"
+	
+
 # Terraform apply the core infrastructure, creates the Kubernetes, Vault, Consul setup
 apply_core:
-	cd core && terraform init
+	cd core && terraform init -backend-config=../remotestatebackend.tfvars
 	cd core && terraform apply
 
 # Terraform destroy the core infrastructure
 destroy_core:
-	cd core && terraform init
+	cd core && terraform init -backend-config=../remotestatebackend.tfvars
 	cd core && terraform destroy
 
 # Terraform apply the application infrastructure, creates the Emojify app and required data stores
 apply_emojify:
-	cd emojify && terraform init
-	cd emojify && terraform apply
+	cd emojify && terraform init -backend-config=../remotestatebackend.tfvars
+	cd emojify && terraform apply -var-file=../remotestatedata.tfvars
 
 # Terraform destroy the application infrastructure
 destroy_emojify:
-	cd emojify && terraform init
-	cd emojify && terraform destroy
+	cd emojify && terraform init -backend-config=../remotestatebackend.tfvars
+	cd emojify && terraform destroy -var-file=../remotestatedata.tfvars
 
 # Open the Kubernetes dashboard, runs kubectl proxy in the background
 open_dashboard: get_k8s_config
