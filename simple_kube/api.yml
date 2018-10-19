@@ -1,0 +1,36 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-api
+  labels:
+    app: demo-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-api
+  template:
+    metadata:
+      labels:
+        app: demo-api
+      annotations:
+        "consul.hashicorp.com/connect-inject": "true"
+        "consul.hashicorp.com/connect-service-upstreams": "demo-facebox:8002,demo-payments:8004"
+        "consul.hashicorp.com/connect-service-port": "9090"
+    spec:
+      containers:
+      - name: demo-api
+        image: "nicholasjackson/emojify-api:0.5.4"
+        imagePullPolicy: IfNotPresent
+        command: ["/service/emojify-api"]
+        args: [
+          "-bind-address=127.0.0.1:9090",
+          "-allow-origin=*",
+          "-authn-disable=true",
+          "-payment-address=http://localhost:8004",
+          "-path=/"
+        ]
+        env:
+        - name: FACEBOX
+          value: http://localhost:8002

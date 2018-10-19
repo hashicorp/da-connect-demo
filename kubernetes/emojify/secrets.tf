@@ -18,6 +18,7 @@ data "template_file" "provision_secrets" {
 resource "null_resource" "provision_secrets" {
   triggers {
     private_key_id = "${data.terraform_remote_state.core.jumpbox_key}"
+    firewall_rules = "${azurerm_postgresql_firewall_rule.emojify_db.id}"
   }
 
   connection {

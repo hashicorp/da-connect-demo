@@ -1,0 +1,61 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-web-configmap
+data:
+  config: |
+    window.env = {};
+    window.env.config = {
+      AUTH_URL: '/auth',
+      API_URL: '/api/',
+      HOME_URL: '/',
+      PAYMENT_URL: '/api/payments',
+      PAYMENT_ENABLED: true,
+      OAUTH_ENABLED: false,
+      AUTH_DISABLED: true
+    };
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-website
+  labels:
+    app: demo-website
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-website
+  template:
+    metadata:
+      labels:
+        app: demo-website
+      annotations:
+        "consul.hashicorp.com/connect-inject": "true"
+        "consul.hashicorp.com/connect-service-port": "5000"
+
+    spec:
+      volumes:
+      - name: config
+        configMap:
+          name: demo-web-configmap
+          items:
+          - key: config
+            path: env.js
+      containers:
+      - name: demo-website
+        image: "nicholasjackson/emojify-website:0.5.4"
+        imagePullPolicy: Always
+        command: ["serve"]
+        args: [
+          "-s",
+          "-l", "tcp://127.0.0.1:5000",
+          "build"
+        ]
+
+        volumeMounts:
+        - name: config
+          mountPath: /app/build/config/
+          readOnly: true

@@ -1,0 +1,84 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-ingress
+spec:
+  selector:
+    app: demo-ingress
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-ingress-configmap
+data:
+  config: |
+    events {
+      worker_connections  1024;
+    }
+
+    http {
+      upstream demo-website {
+        server localhost:8000;
+      }
+      upstream demo-api {
+        server localhost:8001;
+      }
+
+      server {
+        location / {
+          proxy_pass http://demo-website;
+          proxy_set_header Host $host;
+        }
+
+        location ~ ^/api(/.*)?$ {
+          proxy_pass http://demo-api$1$is_args$args;
+          proxy_pass_request_headers on;
+        }
+      }
+    }
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-ingress
+  labels:
+    app: demo-ingress
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-ingress
+  template:
+    metadata:
+      labels:
+        app: demo-ingress
+      annotations:
+        "consul.hashicorp.com/connect-inject": "true"
+        "consul.hashicorp.com/connect-service-upstreams": "demo-website:8000,demo-api:8001"
+        "consul.hashicorp.com/connect-service-port": "80"
+    spec:
+      volumes:
+      - name: config
+        configMap:
+          name: demo-ingress-configmap
+          items:
+          - key: config
+            path: nginx.conf
+      containers:
+      - name: nginx
+        image: nginx:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: config
+          mountPath: /etc/nginx/

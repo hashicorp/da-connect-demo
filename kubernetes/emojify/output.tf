@@ -35,3 +35,11 @@ output "redis_key" {
 output "application_fqdn" {
   value = "${data.terraform_remote_state.core.k8s_ingress_fqdn}"
 }
+
+output "payment_host" {
+  value = "${data.azurerm_public_ip.payment.ip_address}"
+}
+
+output "payment_key" {
+  value = "${tls_private_key.payment.private_key_pem}"
+}

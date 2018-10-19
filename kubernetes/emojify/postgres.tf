@@ -4,8 +4,8 @@ resource "azurerm_postgresql_server" "emojify_db" {
   location            = "${data.terraform_remote_state.core.location}"
 
   sku {
-    name     = "B_Gen5_2"
-    capacity = 2
+    name     = "B_Gen5_1"
+    capacity = 1
     tier     = "Basic"
     family   = "Gen5"
   }
@@ -31,6 +31,7 @@ resource "azurerm_postgresql_database" "emojify_db" {
   collation = "English_United States.1252"
 }
 
+# Allow internal ingress
 resource "azurerm_postgresql_firewall_rule" "emojify_db" {
   name                = "azure"
   resource_group_name = "${data.terraform_remote_state.core.resource_group_name}"
@@ -39,8 +40,7 @@ resource "azurerm_postgresql_firewall_rule" "emojify_db" {
   end_ip_address      = "0.0.0.0"
 }
 
-# Add Consul Connect Proxy
-# Note, could we use a container group?
+/*
 resource "tls_private_key" "emojify_db" {
   algorithm = "RSA"
   rsa_bits  = "4096"
@@ -151,3 +151,5 @@ resource "null_resource" "connect_provision" {
     destination = "/tmp/provision.sh"
   }
 }
+*/
+

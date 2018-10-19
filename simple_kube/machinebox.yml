@@ -1,0 +1,33 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-facebox
+  labels:
+    app: demo-facebox
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: demo-facebox
+  template:
+    metadata:
+      labels:
+        app: demo-facebox
+      annotations:
+        "consul.hashicorp.com/connect-inject": "true"
+        "consul.hashicorp.com/connect-service-port": "8080"
+    spec:
+      containers:
+      - name: demo-facebox
+        image: "machinebox/facebox"
+        env:
+        - name: MB_KEY
+          valueFrom:
+            secretKeyRef:
+              name: demo-secrets
+              key: mb_key
+        - name: MB_ADDRESS
+          value: "127.0.0.1"
+        - name: MB_PORT
+          value: "8080"

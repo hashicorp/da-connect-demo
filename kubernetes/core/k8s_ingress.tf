@@ -9,7 +9,7 @@ resource "random_string" "domain" {
 resource "azurerm_public_ip" "ingress_ip" {
   name                         = "ingress-pip"
   location                     = "${azurerm_resource_group.core.location}"
-  resource_group_name          = "MC_${azurerm_resource_group.core.name}_emojify_${azurerm_resource_group.core.location}"
+  resource_group_name          = "mc_${azurerm_resource_group.core.name}_${var.cluster_name}_${azurerm_resource_group.core.location}"
   public_ip_address_allocation = "Static"
   idle_timeout_in_minutes      = 30
   domain_name_label            = "${random_string.domain.result}"
@@ -37,7 +37,7 @@ resource "helm_release" "cert_manager" {
 
   set {
     name  = "ingressShim.defaultIssuerName"
-    value = "letsencrypt-staging"
+    value = "letsencrypt-prod"
   }
 
   set {
@@ -52,6 +52,9 @@ resource "helm_release" "cert_manager" {
 }
 
 resource "helm_release" "nginx_ingress" {
+  # Wait for cert manager to be installed and the K8s cluster issuer to have been created
+  depends_on = ["helm_release.cert_manager", "null_resource.provision_jumpbox"]
+
   name       = "nginx-ingress"
   repository = "${helm_repository.incubator.metadata.0.name}"
   chart      = "stable/nginx-ingress"

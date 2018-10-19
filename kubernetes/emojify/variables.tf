@@ -2,7 +2,7 @@ variable "machinebox_key" {
   description = "API Key for machinebox"
 }
 
-variable "cloudflare_enable" {
+variable "cloudflare_enabled" {
   description = "Enable cloudflare CDN?"
   default     = false
 }
@@ -22,6 +22,8 @@ variable "github_auth_client_id" {
 variable "github_auth_client_secret" {
   description = "GitHub client secret for GitHub oAuth"
 }
+
+variable "images_resource_group" {}
 
 variable "remote_state_resource_group_name" {}
 

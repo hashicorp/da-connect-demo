@@ -3,12 +3,17 @@
 This demo shows how connect can be used in a multi-tier microservice environment
 
 ## Architecture
-The application is comprised of 3 microservices, none of which are publically accessible:
-1. Web Frontend (React, browser based)
-1. API Service (Golang)
-1. Face detection service (Machinebox)
+The application is comprised of 5 microservices and two data stores
+1. Nginx Ingress for Kubernetes with SSL certificates
+1. Web Frontend (React, browser based) - Public
+1. API Service (Golang) - Public
+1. OAuth service (Keratin) - Public
+1. Cache Service backed by cloud storage (Golang) - Private
+1. Face detection service (Machinebox) - Private
+1. Redis - Private
+1. Postgres - Private
 
-The microservices are running in a pod which is also configured with a Consul Connect proxy which is running as a sidecar.
+The microservices are running in a pod which uses the auto inject feature of Consul Connect on Kubernetes to auto create the Envoy proxy sidecar 
 
 To route requests to the frontend and api microservices a router is sitting behind a public loadbalancer.  The router is using the Connect Go SDK to proxy requests to the upstream services.
 
@@ -48,11 +53,11 @@ GitHub [http://github.com/nicholasjackson/consul-connect-router](http://github.c
 
 Docker: nicholasjackson/consul-connect-router
 
-To route requests from the public internet to the private services the Consul Connect Router project is used.  This service uses the  Connect Go SDK which allows requests to be transparently and securely proxied to the upstream services.
+To route requests from the private kubernetes cluster to the private data network segment the Consul Connect Router project is used.  This service uses the  Connect Go SDK which allows requests to be transparently and securely proxied to the upstream services.
 
 
 ## Setup
-The example project runs on Kubernetes, currently the example Terraform will create a cluster in Azure however any Kubernetes cluster will work.
+The example project runs on Kubernetes, currently the example Terraform will create a cluster in Azure.
 
 ### Install the helm provider
 
@@ -60,23 +65,56 @@ The example project runs on Kubernetes, currently the example Terraform will cre
 make install_helm_provider
 ```
 
+### Install the helm client
+
+```bash
+brew install helm
+```
+
+### Init helm client
+```
+helm init -client
+```
+
 ### Configure environment variables
 You will need to set the following environment variables which correspond to your account in azure
 
 ```bash
-export ARM_SUBSCRIPTION_ID=xxxxxxxxxx
-export ARM_CLIENT_ID=xxxxxxxxxxx
-export ARM_CLIENT_SECRET=xxxxxxxxx
-export ARM_TENANT_ID=xxxxxxxxxxx
+# Set your Azure credentials 
+export ARM_SUBSCRIPTION_ID=xxxxxxxx
+export ARM_CLIENT_ID=xxxxxxxx
+export ARM_CLIENT_SECRET=xxxxxxxx
+export ARM_TENANT_ID=xxxxxxx
 
 export TF_VAR_client_id=${ARM_CLIENT_ID}
 export TF_VAR_client_secret=${ARM_CLIENT_SECRET}
+export TF_VAR_tennant_id=${ARM_TENANT_ID}
 
-# Machine Box API Key
-export TF_VAR_machinebox_key=xxxxxxxxxx
+# Machine Box API Key, get a free developer account from https://machinebox.io/
+export TF_VAR_machinebox_key=xxxxxxxxx
+
+# Optionally create a CloudFlare CDN, set TF_VAR_cloudflare_enabled=false if not using CloudFlare
+export TF_VAR_cloudflare_enabled=true
+export CLOUDFLARE_EMAIL=your@email.address
+export CLOUDFLARE_TOKEN=xxxxxxxx
+export TF_VAR_cloudflare_domain=domain_zone_maps_to.com
+export TF_VAR_cloudflare_zone_id="yourzone_id"
+
+# Optionally enable Github Auth, see GitHub auth section for help
+export TF_VAR_github_auth_enabled=true
+export TF_VAR_github_auth_client_id=xxxxxxxx
+export TF_VAR_github_auth_client_secret=xxxxxxxxxx
+
+# Email address for lets encyrpt
+export TF_VAR_letsencrypt_email="your@email.address"
 ```
 
-A MachineBox API key can be obtained by creating an account at: [https://machinebox.io/account](https://machinebox.io/account)
+## Remote State
+The application uses Terraform remote state with the Azure backend, to configure the variables required for remotestate run the command `make setup_remote_state`. You will be prompted for your remote state values, which will be written to the files remotestatebackend.tfvars and remotestatedata.tfvars.
+
+```bash
+make setup_remote_state
+```
 
 ## Core infrastructure
 The application is broken into two components, the core infrastructure consists of the Kubernetes cluster with running Consul server, and a Vault instance.
@@ -98,6 +136,13 @@ make open_dashboard
 ```
 ![](./assets/k8s_dashboard.png)
 
+### Login to the jumpbox
+There is a bastion host or jumpbox configured which you can use to access `kubectl` and interact with `HashiCorp Vault`, to ssh into this machine use the following command.
+
+```
+make ssh_jumpbox
+```
+
 ### View the Consul UI
 To view the consul UI you can port forward to the clusters consul-server
 
@@ -113,8 +158,7 @@ Once the cluster has been created the configuration which allows connections wit
 ```bash
 make get_k8s_config
 ```
-
-We then need to set an environment variable pointing to the downloaded configuration
+We can then set an environment variable pointing to the downloaded configuration
 
 ```bash
 export KUBECONFIG=$(pwd)/kube_config.yml
@@ -123,23 +167,22 @@ export KUBECONFIG=$(pwd)/kube_config.yml
 You can now use `kubectl` to interact with the cluster
 
 ## Application infrastructure
-To install the application and create its required infrastructure perform the following steps, this will take approximately 3 minutes to complete depending on how long it take to create the external loadbalancer.
+To install the application and create its required infrastructure perform the following steps, this will take approximately 20 minutes to complete as it can take a reasonable amount of time to create the Redis cluster in Azure.
 
 ### Installing the application
 To install and run the application first ensure you have created the core infrastructure then run
 
 ```bash
-make apply_app
+make apply_emojify
 ```
 
 ### Open application frontpage
 
 ```bash
-make open_app
+make open_emojify
 ```
 
 ![](./assets/app.png)
 
 ## TODO
 [] Implement Consul ACLs to correctly secure the Consul Agents and Proxies  
-[] Add SSL to public loadbalancer

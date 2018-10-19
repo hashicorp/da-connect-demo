@@ -44,7 +44,7 @@ provider "helm" {
 
 # Select the domain based on if we are using Cloudflare CDN or not
 locals {
-  domain = "${data.terraform_remote_state.core.k8s_ingress_fqdn}"
+  domain = "${var.cloudflare_enabled ? var.cloudflare_domain : data.terraform_remote_state.core.k8s_ingress_fqdn}"
 }
 
 # Start our application
@@ -58,7 +58,7 @@ resource "helm_release" "emojify" {
 
   set {
     name  = "version"
-    value = "0.1.50"
+    value = "0.1.65"
   }
 
   set {
@@ -93,31 +93,6 @@ resource "helm_release" "emojify" {
 
   set {
     name  = "ingress_fqdn"
-    value = "${data.terraform_remote_state.core.k8s_ingress_fqdn}"
-  }
-
-  set {
-    name  = "auth_replicas"
-    value = "1"
-  }
-
-  set {
-    name  = "api_replicas"
-    value = "1"
-  }
-
-  set {
-    name  = "router_replicas"
-    value = "1"
-  }
-
-  set {
-    name  = "website_replicas"
-    value = "1"
-  }
-
-  set {
-    name  = "facebox_replicas"
-    value = "1"
+    value = "${local.domain}"
   }
 }

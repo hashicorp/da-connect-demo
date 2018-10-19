@@ -1,0 +1,24 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-payments
+  labels:
+    app: demo-payments
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-payments
+  template:
+    metadata:
+      labels:
+        app: demo-payments
+      annotations:
+        "consul.hashicorp.com/connect-inject": "true"
+        "consul.hashicorp.com/connect-service-port": "8080"
+    spec:
+      containers:
+      - name: demo-payments
+        image: "nicholasjackson/emojify-payments:0.5.4"
+        imagePullPolicy: IfNotPresent

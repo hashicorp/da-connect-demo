@@ -37,3 +37,5 @@ variable "vault_token" {
 variable "letsencrypt_email" {
   description = "Email address to use for LetsEncrypt certificates"
 }
+
+variable "images_resource_group" {}

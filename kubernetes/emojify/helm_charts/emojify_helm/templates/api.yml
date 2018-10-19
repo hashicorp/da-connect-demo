@@ -32,7 +32,7 @@ spec:
         app: emojify-api
       annotations:
         "consul.hashicorp.com/connect-inject": "true"
-        "consul.hashicorp.com/connect-service-upstreams": "emojify-auth:8002,emojify-facebox:8003"
+        "consul.hashicorp.com/connect-service-upstreams": "emojify-auth:8002,emojify-facebox:8003,payment:8004"
         "consul.hashicorp.com/connect-service-port": "9090"
     spec:
       containers:
@@ -45,6 +45,7 @@ spec:
           "-authn-server={{ .Values.auth_uri }}",
           "-authn-audience={{ .Values.domain }}",
           "-bind-address=0.0.0.0:9090",
+          "-payment-address=http://localhost:8004",
           "-path=/api/"
         ]
         ports:

@@ -33,11 +33,17 @@ resource "random_string" "password_jumpbox" {
   special = true
 }
 
+# Create an MSI identiry to allow authentication with Vault
 resource "azurerm_user_assigned_identity" "jumpbox_identity" {
   location            = "${azurerm_resource_group.core.location}"
   resource_group_name = "${azurerm_resource_group.core.name}"
 
   name = "jumpbox-vm"
+}
+
+data "azurerm_image" "jumpbox" {
+  name                = "jumpbox"
+  resource_group_name = "${var.images_resource_group}"
 }
 
 resource "azurerm_virtual_machine" "jumpbox" {
@@ -50,10 +56,7 @@ resource "azurerm_virtual_machine" "jumpbox" {
   delete_os_disk_on_termination = true
 
   storage_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
-    version   = "latest"
+    id = "${data.azurerm_image.jumpbox.0.id}"
   }
 
   storage_os_disk {
@@ -100,11 +103,8 @@ data "template_file" "provision_jumpbox" {
   template = "${file("${path.module}/scripts/provision_jumpbox.sh")}"
 
   vars {
-    consul_version    = "1.2.3"
-    vault_version     = "0.11.1"
     kube_config       = "${azurerm_kubernetes_cluster.k8s.0.kube_config_raw}"
     kube_ca_cert      = "${base64decode(azurerm_kubernetes_cluster.k8s.kube_config.0.cluster_ca_certificate)}"
-    vault_token       = "${var.vault_token}"
     letsencrypt_email = "${var.letsencrypt_email}"
   }
 }
@@ -112,6 +112,7 @@ data "template_file" "provision_jumpbox" {
 resource "null_resource" "provision_jumpbox" {
   triggers {
     vault_id       = "${azurerm_virtual_machine.vault.id}"
+    jumpbox_id     = "${azurerm_virtual_machine.jumpbox.id}"
     private_key_id = "${tls_private_key.jumpbox.id}"
     consul         = "${helm_release.consul.id}"
   }

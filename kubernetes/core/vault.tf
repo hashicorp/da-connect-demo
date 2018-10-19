@@ -44,6 +44,11 @@ resource "azurerm_user_assigned_identity" "vault_identity" {
   name = "vault-vm"
 }
 
+data "azurerm_image" "vault" {
+  name                = "vault"
+  resource_group_name = "${var.images_resource_group}"
+}
+
 resource "azurerm_virtual_machine" "vault" {
   name                  = "vault-vm"
   location              = "${azurerm_resource_group.core.location}"
@@ -54,10 +59,7 @@ resource "azurerm_virtual_machine" "vault" {
   delete_os_disk_on_termination = true
 
   storage_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
-    version   = "latest"
+    id = "${data.azurerm_image.vault.0.id}"
   }
 
   storage_os_disk {
@@ -104,10 +106,7 @@ data "template_file" "provision" {
   template = "${file("${path.module}/scripts/provision_vault.sh")}"
 
   vars {
-    consul_version       = "1.2.3"
-    vault_version        = "0.11.1"
-    kube_config          = "${azurerm_kubernetes_cluster.k8s.0.kube_config_raw}"
-    vault_listen_address = "${azurerm_network_interface.vault.private_ip_address}:8200"
+    kube_config = "${azurerm_kubernetes_cluster.k8s.0.kube_config_raw}"
   }
 }
 

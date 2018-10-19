@@ -8,9 +8,12 @@ data:
     window.env = {};
     window.env.config = {
       AUTH_URL: '{{ .Values.auth_uri }}',
-      API_URL: '{{ .Values.api_uri }}',
+      API_URL: '{{ .Values.api_uri }}/',
       HOME_URL: '{{ .Values.home_uri }}',
-      OAUTH_ENABLED: true
+      PAYMENT_URL: '{{ .Values.api_uri }}/payments',
+      PAYMENT_ENABLED: true,
+      OAUTH_ENABLED: true,
+      AUTH_DISABLED: false
     };
 
 ---
@@ -22,10 +25,10 @@ metadata:
     app: emojify-website
 spec:
   ports:
-    - port: 5000
-      targetPort: 5000
-      protocol: TCP
-      name: http
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+    name: http
   selector:
     app: emojify-website
 
@@ -47,22 +50,22 @@ spec:
         app: emojify-website
     spec:
       volumes:
-        - name: config
-          configMap:
-            name: emojify-web-configmap
-            items:
-              - key: config
-                path: env.js
+      - name: config
+        configMap:
+          name: emojify-web-configmap
+          items:
+          - key: config
+            path: env.js
       containers:
-        - name: emojify-website
-          image: "nicholasjackson/emojify-website:latest"
-          imagePullPolicy: Always
-          command: ["serve"]
-          args: ["-s", "build"]
-          ports:
-            - containerPort: 5000
+      - name: emojify-website
+        image: "nicholasjackson/emojify-website:latest"
+        imagePullPolicy: Always
+        command: ["serve"]
+        args: ["-s", "build"]
+        ports:
+        - containerPort: 5000
 
-          volumeMounts:
-            - name: config
-              mountPath: /app/build/config/
-              readOnly: true
+        volumeMounts:
+        - name: config
+          mountPath: /app/build/config/
+          readOnly: true

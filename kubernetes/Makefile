@@ -122,6 +122,10 @@ ssh_jumpbox: get_jumpbox_private_key
 	@echo "Logging into Jumpbox server"
 	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ./jumpbox_key.pem ubuntu@$(shell cd core && terraform output jumpbox_host)
 
+ssh_payment: get_payment_private_key
+	@echo "Logging into Payment server"
+	ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -i ./payment_key.pem ubuntu@$(shell cd emojify && terraform output payment_host)
+
 # Fetch the kubernetes config from the core state
 get_k8s_config:
 	@echo "Fetching kubernetes config from core state"
@@ -136,6 +140,14 @@ get_jumpbox_private_key:
 	$(call terraform_output, jumpbox_key) > jumpbox_key.pem
 	@chmod 0600 ./jumpbox_key.pem
 
+get_payment_private_key:
+	$(call terraform_emojify_output, payment_key) > payment_key.pem
+	@chmod 0600 ./payment_key.pem
+
 define terraform_output
 	@bash -c "cd core && terraform output $(1)"
+endef
+
+define terraform_emojify_output
+	@bash -c "cd emojify && terraform output $(1)"
 endef
