@@ -1,6 +1,9 @@
 # da-connect-demo
 Some simple demos for Consul Connect, mostly work in progress, but hopefully useful
 
+This repository is deprecated for the latest versions of the example apps please see:  
+[https://github.com/emojify-app/stack](https://github.com/emojify-app/stack)
+
 ## Docker
 Simple example of running a Connect environment using Docker Compose.  The stack uses SoCat and PostgreSQL to show how you can secure simple Layer 4 services.
 
