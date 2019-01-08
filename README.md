@@ -16,7 +16,7 @@ A more fully featured example of a small microservice system running in Kubernet
 [./kubernetes-azure](./kubernetes-azure)
 
 ## Slides
-Slide deck showing why a Service Mesh is an important component in todays systems and also how Connect works.
+Slide deck showing why a Service Mesh is an important component in today's systems and also how Connect works.
 
 [Keynote](https://github.com/hashicorp/da-connect-demo/tree/master/slides)
 
