@@ -1,4 +1,7 @@
 #! /bin/bash -e
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 
 apt-get update
 apt-get install -y unzip jq apt-transport-https

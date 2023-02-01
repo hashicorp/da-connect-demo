@@ -1,4 +1,7 @@
 #!/bin/bash -e
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 consul_version=1.3.0
 payments_version=0.1.0
 

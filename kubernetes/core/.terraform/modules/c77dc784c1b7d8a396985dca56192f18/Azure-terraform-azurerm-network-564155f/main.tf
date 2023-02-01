@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 #Azure Generic vNet Module
 resource "azurerm_resource_group" "network" {
   name     = "${var.resource_group_name}"

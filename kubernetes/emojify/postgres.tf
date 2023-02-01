@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 resource "azurerm_postgresql_server" "emojify_db" {
   name                = "emojify-db"
   resource_group_name = "${data.terraform_remote_state.core.resource_group_name}"

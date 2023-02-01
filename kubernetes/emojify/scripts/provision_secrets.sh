@@ -1,4 +1,7 @@
 #!/bin/bash
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 export VAULT_ADDR=http://vault.service.consul:8200
 export VAULT_TOKEN=$(cat /home/ubuntu/.vault_token)
 

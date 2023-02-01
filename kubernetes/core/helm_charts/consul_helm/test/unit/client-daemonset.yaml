@@ -1,4 +1,7 @@
 #!/usr/bin/env bats
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 
 load _helpers
 

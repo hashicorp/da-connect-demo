@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Run consul on kubernetes
 resource "helm_release" "consul" {
   name    = "consul"

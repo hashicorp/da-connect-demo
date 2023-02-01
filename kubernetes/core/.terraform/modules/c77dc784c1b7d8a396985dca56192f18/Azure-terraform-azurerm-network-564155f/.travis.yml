@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Build matrix / environment variable are explained on:
 # http://about.travis-ci.org/docs/user/build-configuration/
 # This file can be validated on:

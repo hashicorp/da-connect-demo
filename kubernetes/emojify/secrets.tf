@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 # Setup the intial Vault secrets required to enable the K8s auth and 
 # dynamic secrets for our applicaton
 data "template_file" "provision_secrets" {

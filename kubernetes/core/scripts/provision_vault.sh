@@ -1,4 +1,7 @@
 #! /bin/bash -e
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 
 # Add K8s config for Consul auto join
 
