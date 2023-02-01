@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 resource "azurerm_redis_cache" "emojify_cache" {
   name                = "emojify-redis"
   resource_group_name = "${data.terraform_remote_state.core.resource_group_name}"

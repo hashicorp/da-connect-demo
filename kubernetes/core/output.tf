@@ -1,3 +1,6 @@
+# Copyright (c) HashiCorp, Inc.
+# SPDX-License-Identifier: MPL-2.0
+
 output "k8s_client_key" {
   value = "${azurerm_kubernetes_cluster.k8s.kube_config.0.client_key}"
 }
