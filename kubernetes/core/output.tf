@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 output "k8s_client_key" {
   value = "${azurerm_kubernetes_cluster.k8s.kube_config.0.client_key}"
 }

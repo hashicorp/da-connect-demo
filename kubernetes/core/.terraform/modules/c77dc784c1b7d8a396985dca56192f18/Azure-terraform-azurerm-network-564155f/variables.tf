@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 variable "vnet_name" {
   description = "Name of the vnet to create"
   default     = "acctvnet"

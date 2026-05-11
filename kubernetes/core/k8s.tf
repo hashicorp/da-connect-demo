@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 provider "azurerm" {}
 
 resource "tls_private_key" "k8s" {

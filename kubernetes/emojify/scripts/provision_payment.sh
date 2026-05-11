@@ -1,4 +1,6 @@
 #! /bin/bash -e
+# Copyright IBM Corp. 2018, 2026
+
 
 # Add K8s config for consul auto join
 mkdir -p /home/ubuntu/.kube

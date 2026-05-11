@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 resource "azurerm_network_security_group" "connect" {
   name                = "networkSegments"
   location            = "${azurerm_resource_group.core.location}"

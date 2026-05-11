@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 # Setup the intial Vault secrets required to enable the K8s and 
 # VM auth endpoints
 

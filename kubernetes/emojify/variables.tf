@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 variable "machinebox_key" {
   description = "API Key for machinebox"
 }

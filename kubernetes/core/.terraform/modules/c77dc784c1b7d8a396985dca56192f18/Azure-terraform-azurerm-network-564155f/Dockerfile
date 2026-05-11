@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 # Pull the base image with given version.
 ARG BUILD_TERRAFORM_VERSION="0.11.7"
 FROM microsoft/terraform-test:${BUILD_TERRAFORM_VERSION}

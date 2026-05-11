@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 ruby "~> 2.3.0"
 
 source 'https://rubygems.org/'

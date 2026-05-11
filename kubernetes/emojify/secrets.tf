@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 # Setup the intial Vault secrets required to enable the K8s auth and 
 # dynamic secrets for our applicaton
 data "template_file" "provision_secrets" {

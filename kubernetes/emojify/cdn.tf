@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 # Configure cloud flare zone with IP address from kubernetes service
 resource "cloudflare_record" "root" {
   count = "${var.cloudflare_enabled ? 1 : 0}"

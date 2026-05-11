@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 output "vnet_id" {
   description = "The id of the newly created vNet"
   value       = "${azurerm_virtual_network.vnet.id}"

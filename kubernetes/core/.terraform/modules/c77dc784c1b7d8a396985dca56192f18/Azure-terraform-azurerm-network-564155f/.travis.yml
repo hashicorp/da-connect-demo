@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 # Build matrix / environment variable are explained on:
 # http://about.travis-ci.org/docs/user/build-configuration/
 # This file can be validated on:

@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 resource "random_string" "domain" {
   length  = 10
   special = false
