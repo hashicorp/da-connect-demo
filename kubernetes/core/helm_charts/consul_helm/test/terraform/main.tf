@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 locals {
   service_account_path = "${path.module}/service-account.yaml"
 }

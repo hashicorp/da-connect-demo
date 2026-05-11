@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 variable resource_group_name {
   default = "emojify-connect-demo"
 }

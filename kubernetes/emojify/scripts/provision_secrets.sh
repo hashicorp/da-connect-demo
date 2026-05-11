@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright IBM Corp. 2018, 2026
+
 export VAULT_ADDR=http://vault.service.consul:8200
 export VAULT_TOKEN=$(cat /home/ubuntu/.vault_token)
 

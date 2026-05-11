@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 resource "random_id" "rg_name" {
   byte_length = 8
 }

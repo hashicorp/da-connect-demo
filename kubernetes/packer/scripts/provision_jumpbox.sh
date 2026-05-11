@@ -1,4 +1,6 @@
 #! /bin/bash -e
+# Copyright IBM Corp. 2018, 2026
+
 apt-get update
 apt-get install -y unzip jq apt-transport-https dnsmasq redis-tools postgresql-client
 

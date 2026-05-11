@@ -1,3 +1,5 @@
+# Copyright IBM Corp. 2018, 2026
+
 # Run consul on kubernetes
 resource "helm_release" "consul" {
   name    = "consul"

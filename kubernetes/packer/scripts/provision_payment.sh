@@ -1,4 +1,6 @@
 #!/bin/bash -e
+# Copyright IBM Corp. 2018, 2026
+
 consul_version=1.3.0
 payments_version=0.1.0
 

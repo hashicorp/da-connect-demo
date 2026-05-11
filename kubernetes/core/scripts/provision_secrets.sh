@@ -1,4 +1,6 @@
 #!/bin/bash
+# Copyright IBM Corp. 2018, 2026
+
 export VAULT_ADDR=http://localhost:8200
 export VAULT_TOKEN=${vault_token}
 

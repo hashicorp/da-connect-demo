@@ -1,4 +1,6 @@
 #! /bin/bash -e
+# Copyright IBM Corp. 2018, 2026
+
 
 sudo apt-get update
 sudo apt-get install -y unzip
